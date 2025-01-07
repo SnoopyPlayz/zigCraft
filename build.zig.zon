@@ -1,0 +1,16 @@
+.{
+    .name = "ZIS3D",
+    .version = "0.0.1",
+    .dependencies = .{
+        .@"raylib-zig" = .{
+            //.url = "https://github.com/Not-Nik/raylib-zig/archive/refs/tags/v5.5-dev.zip",
+            .url = "https://github.com/Not-Nik/raylib-zig/archive/refs/heads/devel.zip",
+            .hash = "12203d859a74737cefe2e1d345a612b59fd372030cc749f9950ef418e7e0cb7d15e5",
+        },
+        //.tracy = .{
+        //    .url = "https://github.com/nektro/zig-tracy/archive/refs/heads/master.zip",
+        //    .hash = "122095dac2f8f2e1f7784d23aa2259453bbe4bf9ad4fd6aec5f39010e469ad75f2bf",
+        //}
+    },
+    .paths = .{""},
+}
