@@ -58,6 +58,7 @@ pub fn drawShadow() void{
         ray.BeginTextureMode(shadowMap);
         ray.ClearBackground(ray.RAYWHITE);
         ray.rlSetCullFace(ray.RL_CULL_FACE_FRONT);
+
         ray.BeginMode3D(lightCam);
         const lightView = ray.rlGetMatrixModelview();
         const lightProj = ray.rlGetMatrixProjection();

@@ -14,6 +14,7 @@ pub var camera = ray.Camera3D{
 };
 
 var col: ray.RayCollision = undefined;
+var selectedBlock: u8 = 1;
 pub fn update() void{
     // Shadow follow player
     if(@abs((shader.lightCam.position.x + shader.lightCam.position.z) - (camera.position.x + camera.position.z)) > 50){
@@ -21,6 +22,11 @@ pub fn update() void{
         shader.lightCam.position.z = camera.position.z;
         shader.lightCam.target.x = camera.position.x;
         shader.lightCam.target.z = camera.position.z + 0.001;
+    }
+
+    for(49..57) |key|{
+        if(ray.IsKeyDown(@intCast(key)))
+            selectedBlock = @intCast(key - 48);
     }
 
     col = .{.distance = 100};
@@ -50,11 +56,11 @@ pub fn update() void{
     if(col.hit){
         const pointa = ray.Vector3Add(col.point, ray.Vector3Scale(col.normal, 0.5));
         if(util.IsKeyPressed(ray.MOUSE_BUTTON_RIGHT) and map.getBlock(@intFromFloat(@round(pointa.x)), @intFromFloat(@round(pointa.y)), @intFromFloat(@round(pointa.z))) == 0){
-            map.setBlock(@intFromFloat(@round(pointa.x)), @intFromFloat(@round(pointa.y)), @intFromFloat(@round(pointa.z)), 1);
+            map.setBlock(@intFromFloat(@round(pointa.x)), @intFromFloat(@round(pointa.y)), @intFromFloat(@round(pointa.z)), selectedBlock);
         }
 
         const point = ray.Vector3Subtract(col.point, ray.Vector3Scale(col.normal, 0.5));
-        if(util.IsKeyPressed(ray.MOUSE_BUTTON_LEFT) and map.getBlock(@intFromFloat(@round(point.x)), @intFromFloat(@round(point.y)), @intFromFloat(@round(point.z))) == 1){
+        if(util.IsKeyPressed(ray.MOUSE_BUTTON_LEFT) and map.getBlock(@intFromFloat(@round(point.x)), @intFromFloat(@round(point.y)), @intFromFloat(@round(point.z))) != 0){
             map.setBlock(@intFromFloat(@round(point.x)), @intFromFloat(@round(point.y)), @intFromFloat(@round(point.z)), 0);
         }
     }

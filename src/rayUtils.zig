@@ -14,11 +14,11 @@ pub fn loadTexture(texLoc: []const u8) ray.Texture {
     if (map.get(texLoc) != null)
         return map.get(texLoc).?;
 
-    var texture: ray.Texture = ray.LoadTexture(@ptrCast(texLoc));
+    const texture: ray.Texture = ray.LoadTexture(@ptrCast(texLoc));
 
-    ray.GenTextureMipmaps(@ptrCast(&texture));
+    //ray.GenTextureMipmaps(@ptrCast(&texture));
     //ray.SetTextureWrap(texture, ray.TEXTURE_WRAP_REPEAT);
-    ray.SetTextureFilter(texture, ray.TEXTURE_FILTER_ANISOTROPIC_16X);
+    ray.SetTextureFilter(texture, ray.TEXTURE_FILTER_POINT);
 
     map.put(texLoc, texture) catch |err| print("texture hashmap failed: {}", .{err});
     return texture;

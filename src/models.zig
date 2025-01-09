@@ -11,3 +11,4 @@ pub fn setTexture(model: ray.Model, tex: ray.Texture) void{
 pub fn setShadowShader(model: ray.Model) void{
     model.materials[0].shader = shader.shadowShader;
 }
+

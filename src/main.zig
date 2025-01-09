@@ -11,10 +11,10 @@ const print = std.debug.print;
 pub fn main() !void {
     // release enable
     //ray.SetTraceLogLevel(ray.LOG_NONE);
-    ray.SetConfigFlags(ray.FLAG_MSAA_4X_HINT); //| ray.FLAG_WINDOW_RESIZABLE); //| ray.FLAG_WINDOW_HIGHDPI);
+    //ray.SetConfigFlags(ray.FLAG_MSAA_4X_HINT); //| ray.FLAG_WINDOW_RESIZABLE); //| ray.FLAG_WINDOW_HIGHDPI);
 
     //ray.InitWindow(1000, 1000, "kebab 2137 ?????");
-    ray.InitWindow(1280, 720, "kebab 2137 ?????");
+    ray.InitWindow(1280, 720, "zigCraft");
     defer ray.CloseWindow();
 
     //ray.SetTargetFPS(120); // remove this
@@ -29,6 +29,8 @@ pub fn main() !void {
 
     const timePerFrame: f64 = 1.0 / 60.0;
     var lastTime: f64 = getTimeMili();
+
+    ray.rlEnableColorBlend();
 
     while (!ray.WindowShouldClose()) {
         // update
