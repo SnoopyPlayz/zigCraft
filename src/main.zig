@@ -30,8 +30,6 @@ pub fn main() !void {
     const timePerFrame: f64 = 1.0 / 60.0;
     var lastTime: f64 = getTimeMili();
 
-    ray.rlEnableColorBlend();
-
     while (!ray.WindowShouldClose()) {
         // update
         while (@abs(getTimeMili() - lastTime) >= timePerFrame) {
@@ -44,14 +42,22 @@ pub fn main() !void {
         }
 
         ray.BeginDrawing();
+
         util.updateKeysPressed();
 
 
         ray.UpdateCamera(&p.camera, ray.CAMERA_FREE);
+        if(ray.IsKeyDown(ray.KEY_LEFT_SHIFT)){
+            ray.UpdateCamera(&p.camera, ray.CAMERA_FREE);
+        }
         //ray.UpdateCameraPro(&camera, .{ .x = 0.0, .y = 0.0, .z = 0.0 }, .{ .x = @floatCast(ray.GetMouseDelta().x * 0.05), .y = @floatCast(ray.GetMouseDelta().y * 0.05), .z = 0.0 }, // rotation 0.0); // zoom
         shader.drawShadow();
+        ray.ClearBackground(ray.GRAY);
 
         profiler.clear();
+
+        //ray.rlDisableDepthTest();
+        //ray.rlDisableDepthMask();
 
         ray.BeginMode3D(p.camera);
         try gameState.render();

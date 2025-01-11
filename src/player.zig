@@ -6,7 +6,7 @@ const std = @import("std");
 const print = std.debug.print;
 
 pub var camera = ray.Camera3D{
-    .position = .{ .x = 10.0, .y = 10.0, .z = 10.0 },
+    .position = .{ .x = 1.0, .y = 10.0, .z = 1.0 },
     .target = .{ .x = 0.0, .y = 0.0, .z = 0.0 },
     .up = .{ .x = 0.0, .y = 1.0, .z = 0.0 },
     .fovy = 90.0,
@@ -17,11 +17,22 @@ var col: ray.RayCollision = undefined;
 var selectedBlock: u8 = 1;
 pub fn update() void{
     // Shadow follow player
-    if(@abs((shader.lightCam.position.x + shader.lightCam.position.z) - (camera.position.x + camera.position.z)) > 50){
-        shader.lightCam.position.x = camera.position.x;
-        shader.lightCam.position.z = camera.position.z;
-        shader.lightCam.target.x = camera.position.x;
-        shader.lightCam.target.z = camera.position.z + 0.001;
+//    if(@abs((shader.lightCam.position.x + shader.lightCam.position.z) - (camera.position.x + camera.position.z)) > 50){
+//        shader.lightCam.position.x = camera.position.x;
+//        shader.lightCam.position.z = camera.position.z;
+//        shader.lightCam.target.x = camera.position.x;
+//        shader.lightCam.target.z = camera.position.z + 0.001;
+//    }
+//    camera.target = shader.lightCam.target;
+//    camera.position = shader.lightCam.position;
+//    camera.fovy = shader.lightCam.fovy;
+//    camera.projection = shader.lightCam.projection;
+    if(ray.IsKeyDown(ray.KEY_K)){
+        shader.lightCam.target.z += 0.01;
+    }
+
+    if(ray.IsKeyDown(ray.KEY_L)){
+        shader.lightCam.target.z -= 0.01;
     }
 
     for(49..57) |key|{

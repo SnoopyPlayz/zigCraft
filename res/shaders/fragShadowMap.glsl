@@ -56,7 +56,7 @@ void main()
     // Slope-scale depth bias: depth biasing reduces "shadow acne" artifacts, where dark stripes appear all over the scene.
     // The solution is adding a small bias to the depth
     // In this case, the bias is proportional to the slope of the surface, relative to the light
-    float bias = max(0.000002 * (1.0 - dot(normal, l)), 0.0000002) - 0.00001;
+    float bias = max(0.0002 * (1.0 - dot(normal, l)), 0.00002) - 0.00001;
     //float bias = max(0.02 * (1.0 - dot(normal, l)), 0.002);
     int shadowCounter = 0;
     const int numSamples = 9;

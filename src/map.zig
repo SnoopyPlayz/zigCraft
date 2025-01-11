@@ -10,6 +10,7 @@ const chunkSize: u8 = 32;
 const Chunk = struct {
     Blocks: [chunkSize][chunkSize][chunkSize]u8,
     Model: ?ray.Model = null,
+    Dirty: bool = false,
 
     fn genMesh(self: *Chunk, pos: ray.Vector3) !void {
         const chunkPosWorld = ray.Vector3Scale(pos, chunkSize);
@@ -99,22 +100,14 @@ const Chunk = struct {
             }
         }
 
-        if (vertList.items.len == 0) //emptyChunk
+        if (vertList.items.len == 0){ //emptyChunk
+            model.unloadMesh(self.Model.?.meshes[0]);
+            self.Model = null;
             return;
+        }
 
         if (self.Model != null) {
-            const mesh = self.Model.?.meshes.*;
-            const vc: f64 = @floatFromInt(mesh.vertexCount);
-
-            util.allocator.free(mesh.vertices[0..@intFromFloat(vc * 3)]);
-            util.allocator.free(mesh.indices[0..@intFromFloat(vc * 1.5)]);
-            util.allocator.free(mesh.texcoords[0..@intFromFloat(vc * 2)]);
-
-            ray.rlUnloadVertexArray(mesh.vaoId);
-
-            for (0..7) |i| {
-                ray.rlUnloadVertexBuffer(mesh.vboId[i]);
-            }
+            model.unloadMesh(self.Model.?.meshes[0]);
         }
 
         var mesh = ray.Mesh{ 
@@ -151,13 +144,25 @@ pub fn draw() void {
     }
 }
 
+pub fn update() void {
+    var mapIter = map.iterator();
+
+    while (mapIter.next()) |chunk| {
+        if (chunk.value_ptr.Dirty == false) continue;
+        chunk.value_ptr.genMesh(chunkPosFromHash(chunk.key_ptr.*)) catch {};
+        //print("fail setBlock chunk at: x:{} \n", .{ @divFloor(z, chunkSize) });
+        chunk.value_ptr.*.Dirty = false;
+    }
+}
+
+
 fn isTransparent(i: u8) bool{
     if(i == 0 or i == 2)
         return true;
     return false;
 }
 
-// x: 101 + y: 010 + z: 001 = hash: 101010001
+// x i32 + y i32 + z i32 = u96 for hashing 
 fn hashingFunc(x: i32, y: i32, z: i32) u96 {
     var result: u96 = @as(u32, @bitCast(x));
     result <<= 32;
@@ -170,11 +175,20 @@ fn hashingFunc(x: i32, y: i32, z: i32) u96 {
     return result;
 }
 
+pub fn chunkPosFromHash(key: u96) ray.Vector3 {
+    var result: ray.Vector3 = undefined;
+    result.x = @floatFromInt(@as(i32, @bitCast(@as(u32, @truncate((key >> 64))))));
+    result.y = @floatFromInt(@as(i32, @bitCast(@as(u32, @truncate(key >> 32)))));
+    result.z = @floatFromInt(@as(i32, @bitCast(@as(u32, @truncate(key)))));
+
+    return result;
+}
+
 pub fn getBlock(x: i32, y: i32, z: i32) u8 {
     const chunk = map.get(hashingFunc(@divFloor(x, chunkSize), @divFloor(y, chunkSize), @divFloor(z, chunkSize)));
 
     if (chunk == null) {
-        print("failed to get chunk at x:{} y:{} z:{} \n", .{ @divFloor(x, chunkSize), @divFloor(y, chunkSize), @divFloor(z, chunkSize) });
+        //print("failed to get chunk at x:{} y:{} z:{} \n", .{ @divFloor(x, chunkSize), @divFloor(y, chunkSize), @divFloor(z, chunkSize) });
         return 0; // return air
     }
 
@@ -182,24 +196,15 @@ pub fn getBlock(x: i32, y: i32, z: i32) u8 {
 }
 
 pub fn setBlock(x: i32, y: i32, z: i32, b: u8) void {
-    const chunk = map.getPtr(hashingFunc(@divFloor(x, chunkSize), @divFloor(y, chunkSize), @divFloor(z, chunkSize)));
+    var chunk = map.getPtr(hashingFunc(@divFloor(x, chunkSize), @divFloor(y, chunkSize), @divFloor(z, chunkSize)));
 
     if (chunk == null) {
-        print("fail setBlock chunk at: x:{} y:{} z:{} \n", .{ @divFloor(x, chunkSize), @divFloor(y, chunkSize), @divFloor(z, chunkSize) });
-        return;
+        addChunk(@divFloor(x, chunkSize), @divFloor(y, chunkSize), @divFloor(z, chunkSize));
+        chunk = map.getPtr(hashingFunc(@divFloor(x, chunkSize), @divFloor(y, chunkSize), @divFloor(z, chunkSize)));
     }
 
     chunk.?.*.Blocks[@intCast(@mod(x, chunkSize))][@intCast(@mod(y, chunkSize))][@intCast(@mod(z, chunkSize))] = b;
-    chunk.?.genMesh(.{ .x = @floatFromInt(@divFloor(x, chunkSize)), .y = @floatFromInt(@divFloor(y, chunkSize)), .z = @floatFromInt(@divFloor(z, chunkSize)) }) catch {};
-}
-
-pub fn chunkPosFromHash(key: u96) ray.Vector3 {
-    var result: ray.Vector3 = undefined;
-    result.x = @floatFromInt(key >> 64);
-    result.y = @floatFromInt(@as(u32, @truncate(key >> 32)));
-    result.z = @floatFromInt(@as(u32, @truncate(key)));
-
-    return result;
+    chunk.?.*.Dirty = true;
 }
 
 const emptyChunk = undefined;
@@ -211,43 +216,4 @@ fn addChunk(x: i32, y: i32, z: i32) void {
 }
 
 pub fn init() !void {
-    addChunk(0, 0, 0);
-
-    for (0..chunkSize) |i| {
-        for (0..chunkSize) |y| {
-            map.getPtr(hashingFunc(0, 0, 0)).?.Blocks[i][0][y] = 1;
-        }
-    }
-
-    map.getPtr(hashingFunc(0, 0, 0)).?.Blocks[0][1][0] = 1;
-
-    addChunk(0, 0, 1);
-    addChunk(0, 0, -1);
-    addChunk(-1, 0, 0);
-    addChunk(-1, 0, 1);
-    addChunk(0, -1, 0);
-    addChunk(0, -1, 1);
-    addChunk(0, 1, 1); // emptyChunk
-    addChunk(1, 0, 1); // emptyChunk
-    addChunk(1, 0, 0); // emptyChunk
-    addChunk(0, 0, 2); // emptyChunk
-
-    for (0..chunkSize) |x| {
-        for (0..chunkSize) |y| {
-            //for (0..chunkSize) |z| {
-            map.getPtr(hashingFunc(0, 0, 1)).?.Blocks[x][y][0] = 1;
-            //}
-        }
-    }
-
-    var mapIter = map.iterator();
-
-    while (mapIter.next()) |chunk| {
-        try chunk.value_ptr.genMesh(chunkPosFromHash(chunk.key_ptr.*));
-        if (chunk.value_ptr.Model == null)
-            continue;
-
-        //chunk.value_ptr.Model.?.materials[0].maps[ray.MATERIAL_MAP_DIFFUSE].texture = util.loadTexture("res/grass.png");
-        chunk.value_ptr.Model.?.materials[0].shader = shader.shadowShader;
-    }
 }

@@ -38,26 +38,22 @@ pub fn init() void {
     lightCam.up = ray.Vector3{ .x = 0.0, .y = 1.0, .z = 0.0 };
     lightCam.fovy = 170.0;
 
-    //camera.position = lightCam.position;
-    p.camera.position = ray.Vector3One();
-    //camera.position = ray.Vector3Zero();
-    p.camera.target = lightCam.target;
-    //camera.fovy = 170;
-    //camera.projection = ray.CAMERA_ORTHOGRAPHIC;
-    //
     // light direction
     var lightDir = ray.Vector3Normalize(ray.Vector3{ .x = lightCam.target.x - lightCam.position.x, .y = -1.0, .z = lightCam.target.z - lightCam.position.z });
     const lightDirLoc = ray.GetShaderLocation(shadowShader, "lightDir");
     ray.SetShaderValue(shadowShader, lightDirLoc, &lightDir, ray.SHADER_ATTRIB_VEC3);
-
 }
 
 pub fn drawShadow() void{
+    var lightDir = ray.Vector3Normalize(ray.Vector3{ .x = lightCam.target.x - lightCam.position.x, .y = -1.0, .z = lightCam.target.z - lightCam.position.z });
+    const lightDirLoc = ray.GetShaderLocation(shadowShader, "lightDir");
+    ray.SetShaderValue(shadowShader, lightDirLoc, &lightDir, ray.SHADER_ATTRIB_VEC3);
+
         ray.SetShaderValue(shadowShader, shadowShader.locs[ray.SHADER_LOC_VECTOR_VIEW], &p.camera.position, ray.SHADER_UNIFORM_VEC3);
 
         ray.BeginTextureMode(shadowMap);
         ray.ClearBackground(ray.RAYWHITE);
-        ray.rlSetCullFace(ray.RL_CULL_FACE_FRONT);
+        //ray.rlSetCullFace(ray.RL_CULL_FACE_FRONT);
 
         ray.BeginMode3D(lightCam);
         const lightView = ray.rlGetMatrixModelview();
@@ -65,11 +61,10 @@ pub fn drawShadow() void{
         try gameState.render();
         ray.EndMode3D();
         ray.EndTextureMode();
-        ray.rlSetCullFace(ray.RL_CULL_FACE_BACK);
+        //ray.rlSetCullFace(ray.RL_CULL_FACE_BACK);
 
         const lightViewProj = ray.MatrixMultiply(lightView, lightProj);
 
-        ray.ClearBackground(ray.GRAY);
         ray.SetShaderValueMatrix(shadowShader, lightVPLoc, lightViewProj);
 
         ray.rlEnableShader(shadowShader.id);

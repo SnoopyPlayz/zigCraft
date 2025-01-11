@@ -2,12 +2,14 @@ const std = @import("std");
 const ray = @import("raylib.zig");
 const player = @import("player.zig");
 const profiler = @import("profiler.zig");
+const mapGen = @import("mapGenerator.zig");
 const util = @import("rayUtils.zig");
 const map = @import("map.zig");
 const print = std.debug.print;
 
 pub fn update() !void {
     player.update();
+    map.update();
 
     if(util.IsKeyPressed(ray.KEY_F11))
         ray.ToggleFullscreen();
@@ -15,6 +17,7 @@ pub fn update() !void {
 
 pub fn init() !void {
     try map.init();
+    mapGen.init();
 }
 
 pub fn render() !void {
@@ -22,4 +25,6 @@ pub fn render() !void {
     map.draw();
     player.render();
     profiler.time("time");
+
+    mapGen.render();
 }
