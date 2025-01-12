@@ -29,15 +29,15 @@ const Chunk = struct {
                     if (self.Blocks[x][y][z] == 0)
                         continue;
 
-                    const blockPosChunk = ray.Vector3{ .x = @floatFromInt(x), .y = @floatFromInt(y), .z = @floatFromInt(z) };
+                    const blockPosChunk = util.toVec3(.{x, y, z});//ray.Vector3{ .x = @floatFromInt(x), .y = @floatFromInt(y), .z = @floatFromInt(z) };
                     const bw = ray.Vector3Add(chunkPosWorld, blockPosChunk);
 
                     const tSize = 1.0 / 16.0; //tile size
-                    const xt = tSize * @as(f32, @floatFromInt(getBlock(@intFromFloat(bw.x), @intFromFloat(bw.y), @intFromFloat(bw.z)) - 1));
+                    const xt = tSize * @as(f32, @floatFromInt(getBlock(.{bw.x, bw.y, bw.z}) - 1));
                     const texCords = [_]f32{ xt, 0.0, tSize + xt, 0.0, tSize + xt, tSize, 0.0 + xt, tSize };
 
                     // up face
-                    if (isTransparent(getBlock(@intFromFloat(bw.x), @intFromFloat(bw.y + 1), @intFromFloat(bw.z)))) {
+                    if (isTransparent(getBlock(.{bw.x, bw.y + 1, bw.z}))) {
                         const vert = [_]f32{ bw.x + -0.5, bw.y + 0.5, bw.z + -0.5, bw.x + 0.5, bw.y + 0.5, bw.z + -0.5, bw.x + 0.5, bw.y + 0.5, bw.z + 0.5, bw.x + -0.5, bw.y + 0.5, bw.z + 0.5 };
                         const inds = [_]u16{ indsOffset, indsOffset + 2, indsOffset + 1, indsOffset, indsOffset + 3, indsOffset + 2 };
 
@@ -47,7 +47,7 @@ const Chunk = struct {
                         indsOffset += 4;
                     }
 
-                    if (isTransparent(getBlock(@intFromFloat(bw.x), @intFromFloat(bw.y - 1), @intFromFloat(bw.z)))) {
+                    if (isTransparent(getBlock(.{bw.x, bw.y - 1, bw.z}))) {
                         const vert = [_]f32{ bw.x + -0.5, bw.y + -0.5, bw.z + -0.5, bw.x + 0.5, bw.y + -0.5, bw.z + -0.5, bw.x + 0.5, bw.y + -0.5, bw.z + 0.5, bw.x + -0.5, bw.y + -0.5, bw.z + 0.5 };
                         const inds = [_]u16{ indsOffset, indsOffset + 1, indsOffset + 2, indsOffset, indsOffset + 2, indsOffset + 3 };
 
@@ -57,7 +57,7 @@ const Chunk = struct {
                         indsOffset += 4;
                     }
 
-                    if (isTransparent(getBlock(@intFromFloat(bw.x), @intFromFloat(bw.y), @intFromFloat(bw.z + 1)))) {
+                    if (isTransparent(getBlock(.{bw.x, bw.y, bw.z + 1}))) {
                         const vert = [_]f32{ bw.x + -0.5, bw.y + -0.5, bw.z + 0.5, bw.x + 0.5, bw.y + -0.5, bw.z + 0.5, bw.x + 0.5, bw.y + 0.5, bw.z + 0.5, bw.x + -0.5, bw.y + 0.5, bw.z + 0.5 };
                         const inds = [_]u16{ indsOffset, indsOffset + 1, indsOffset + 2, indsOffset, indsOffset + 2, indsOffset + 3 };
 
@@ -67,7 +67,7 @@ const Chunk = struct {
                         indsOffset += 4;
                     }
 
-                    if (isTransparent(getBlock(@intFromFloat(bw.x), @intFromFloat(bw.y), @intFromFloat(bw.z - 1)))) {
+                    if (isTransparent(getBlock(.{bw.x, bw.y, bw.z - 1}))) {
                         const vert = [_]f32{ bw.x + -0.5, bw.y + -0.5, bw.z + -0.5, bw.x + 0.5, bw.y + -0.5, bw.z + -0.5, bw.x + 0.5, bw.y + 0.5, bw.z + -0.5, bw.x + -0.5, bw.y + 0.5, bw.z + -0.5 };
                         const inds = [_]u16{ indsOffset, indsOffset + 2, indsOffset + 1, indsOffset, indsOffset + 3, indsOffset + 2 };
 
@@ -77,7 +77,7 @@ const Chunk = struct {
                         indsOffset += 4;
                     }
 
-                    if (isTransparent(getBlock(@intFromFloat(bw.x + 1), @intFromFloat(bw.y), @intFromFloat(bw.z)))) {
+                    if (isTransparent(getBlock(.{bw.x + 1, bw.y, bw.z}))) {
                         const vert = [_]f32{ bw.x + 0.5, bw.y + -0.5, bw.z + -0.5, bw.x + 0.5, bw.y + -0.5, bw.z + 0.5, bw.x + 0.5, bw.y + 0.5, bw.z + 0.5, bw.x + 0.5, bw.y + 0.5, bw.z + -0.5 };
                         const inds = [_]u16{ indsOffset, indsOffset + 2, indsOffset + 1, indsOffset, indsOffset + 3, indsOffset + 2 };
 
@@ -87,7 +87,7 @@ const Chunk = struct {
                         indsOffset += 4;
                     }
 
-                    if (isTransparent(getBlock(@intFromFloat(bw.x - 1), @intFromFloat(bw.y), @intFromFloat(bw.z)))) {
+                    if (isTransparent(getBlock(.{bw.x - 1, bw.y, bw.z}))) {
                         const vert = [_]f32{ bw.x + -0.5, bw.y + -0.5, bw.z + -0.5, bw.x + -0.5, bw.y + -0.5, bw.z + 0.5, bw.x + -0.5, bw.y + 0.5, bw.z + 0.5, bw.x + -0.5, bw.y + 0.5, bw.z + -0.5 };
                         const inds = [_]u16{ indsOffset, indsOffset + 1, indsOffset + 2, indsOffset, indsOffset + 2, indsOffset + 3 };
 
@@ -137,6 +137,16 @@ pub var map = std.AutoHashMap(u96, Chunk).init(util.allocator);
 
 pub fn draw() void {
     var mapIter = map.iterator();
+//    for (0..5) |x|{
+//        for (0..5) |y|{
+//            for (0..5) |z|{
+//                var pos = util.toVec3(.{x, y, z});
+//                pos = ray.Vector3Scale(pos, chunkSize);
+//                pos = ray.Vector3AddValue(pos, 15.5);
+//                ray.DrawCubeWires(pos, chunkSize, chunkSize, chunkSize, ray.WHITE);
+//            }
+//        }
+//    }
 
     while (mapIter.next()) |chunk| {
         if (chunk.value_ptr.Model == null) continue;
@@ -184,15 +194,17 @@ pub fn chunkPosFromHash(key: u96) ray.Vector3 {
     return result;
 }
 
-pub fn getBlock(x: i32, y: i32, z: i32) u8 {
-    const chunk = map.get(hashingFunc(@divFloor(x, chunkSize), @divFloor(y, chunkSize), @divFloor(z, chunkSize)));
+pub fn getBlock(position: anytype) u8 {
+    const pos = util.toIntVec3(position);
+
+    const chunk = map.get(hashingFunc(@divFloor(pos.x, chunkSize), @divFloor(pos.y, chunkSize), @divFloor(pos.z, chunkSize)));
 
     if (chunk == null) {
         //print("failed to get chunk at x:{} y:{} z:{} \n", .{ @divFloor(x, chunkSize), @divFloor(y, chunkSize), @divFloor(z, chunkSize) });
         return 0; // return air
     }
 
-    return chunk.?.Blocks[@intCast(@mod(x, chunkSize))][@intCast(@mod(y, chunkSize))][@intCast(@mod(z, chunkSize))];
+    return chunk.?.Blocks[@intCast(@mod(pos.x, chunkSize))][@intCast(@mod(pos.y, chunkSize))][@intCast(@mod(pos.z, chunkSize))];
 }
 
 pub fn setBlock(x: i32, y: i32, z: i32, b: u8) void {
@@ -201,6 +213,10 @@ pub fn setBlock(x: i32, y: i32, z: i32, b: u8) void {
     if (chunk == null) {
         addChunk(@divFloor(x, chunkSize), @divFloor(y, chunkSize), @divFloor(z, chunkSize));
         chunk = map.getPtr(hashingFunc(@divFloor(x, chunkSize), @divFloor(y, chunkSize), @divFloor(z, chunkSize)));
+    }
+
+    if(@mod(x, chunkSize) - chunkSize == 0){
+        print("border ", .{});
     }
 
     chunk.?.*.Blocks[@intCast(@mod(x, chunkSize))][@intCast(@mod(y, chunkSize))][@intCast(@mod(z, chunkSize))] = b;

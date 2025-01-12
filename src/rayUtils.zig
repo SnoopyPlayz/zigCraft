@@ -51,3 +51,31 @@ pub fn updateKeysPressed() void {
         }
     }
 }
+
+pub fn toVec3(pos: anytype) ray.Vector3{
+    const T = @TypeOf(pos[0]);
+
+    if(T == ray.Vector3)
+        return pos;
+
+    if(T == comptime_int or T == u32 or T == u64 or T == u8 or T == usize)
+        return ray.Vector3{.x = @floatFromInt(pos[0]), .y = @floatFromInt(pos[1]), .z = @floatFromInt(pos[2])};
+
+    return ray.Vector3{.x = @floatCast(pos[0]), .y = @floatCast(pos[1]), .z = @floatCast(pos[2])};
+}
+
+pub const Vector3Int = struct{
+    x: i32, y: i32, z: i32,
+};
+
+pub fn toIntVec3(pos: anytype) Vector3Int{
+    const T = @TypeOf(pos[0]);
+
+    if(T == Vector3Int)
+        return pos;
+
+    if(T == comptime_float or T == f32 or T == f64 or T == f16)
+        return Vector3Int{.x = @intFromFloat(pos[0]), .y = @intFromFloat(pos[1]), .z = @intFromFloat(pos[2])};
+
+    return Vector3Int{.x = @intCast(pos[0]), .y = @intCast(pos[1]), .z = @intCast(pos[2])};
+}

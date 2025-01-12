@@ -66,12 +66,12 @@ pub fn update() void{
 
     if(col.hit){
         const pointa = ray.Vector3Add(col.point, ray.Vector3Scale(col.normal, 0.5));
-        if(util.IsKeyPressed(ray.MOUSE_BUTTON_RIGHT) and map.getBlock(@intFromFloat(@round(pointa.x)), @intFromFloat(@round(pointa.y)), @intFromFloat(@round(pointa.z))) == 0){
+        if(util.IsKeyPressed(ray.MOUSE_BUTTON_RIGHT) and map.getBlock(.{@round(pointa.x), @round(pointa.y), @round(pointa.z)}) == 0){
             map.setBlock(@intFromFloat(@round(pointa.x)), @intFromFloat(@round(pointa.y)), @intFromFloat(@round(pointa.z)), selectedBlock);
         }
 
         const point = ray.Vector3Subtract(col.point, ray.Vector3Scale(col.normal, 0.5));
-        if(util.IsKeyPressed(ray.MOUSE_BUTTON_LEFT) and map.getBlock(@intFromFloat(@round(point.x)), @intFromFloat(@round(point.y)), @intFromFloat(@round(point.z))) != 0){
+        if(util.IsKeyPressed(ray.MOUSE_BUTTON_LEFT) and map.getBlock(.{@round(point.x), @round(point.y), @round(point.z)}) != 0){
             map.setBlock(@intFromFloat(@round(point.x)), @intFromFloat(@round(point.y)), @intFromFloat(@round(point.z)), 0);
         }
     }
