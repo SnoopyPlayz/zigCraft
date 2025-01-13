@@ -24,10 +24,10 @@ pub fn init() void {
             height = @divFloor(height, 100);
             height += 20;
             //ray.DrawCube(.{.x = @floatFromInt(x), .y = @floatFromInt(height), .z = @floatFromInt(y)}, 1, 1, 1, ray.ColorAlpha(ray.BLUE, 1));
-            map.setBlock(@intCast(x), height, @intCast(y), 1);
+            map.setBlock(.{x, height, y}, 1);
 
             for(0..@intCast(height)) |h|{
-                map.setBlock(@intCast(x), height - @as(i32, @intCast(h)), @intCast(y), 1);
+                map.setBlock(.{x, height - @as(i32, @intCast(h)), y}, 1);
             }
         }
     }

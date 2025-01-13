@@ -5,7 +5,7 @@
         .@"raylib-zig" = .{
             //.url = "https://github.com/Not-Nik/raylib-zig/archive/refs/tags/v5.5-dev.zip",
             .url = "https://github.com/Not-Nik/raylib-zig/archive/refs/heads/devel.zip",
-            .hash = "12203d859a74737cefe2e1d345a612b59fd372030cc749f9950ef418e7e0cb7d15e5",
+            .hash = "12206cf18aea41dc1e61b697c36ef627752e84fe9a9362b800240fce7dea3665094d",
         },
         //.tracy = .{
         //    .url = "https://github.com/nektro/zig-tracy/archive/refs/heads/master.zip",

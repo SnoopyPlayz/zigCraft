@@ -207,19 +207,20 @@ pub fn getBlock(position: anytype) u8 {
     return chunk.?.Blocks[@intCast(@mod(pos.x, chunkSize))][@intCast(@mod(pos.y, chunkSize))][@intCast(@mod(pos.z, chunkSize))];
 }
 
-pub fn setBlock(x: i32, y: i32, z: i32, b: u8) void {
-    var chunk = map.getPtr(hashingFunc(@divFloor(x, chunkSize), @divFloor(y, chunkSize), @divFloor(z, chunkSize)));
+pub fn setBlock(position: anytype, b: u8) void {
+    const pos = util.toIntVec3(position);
+    var chunk = map.getPtr(hashingFunc(@divFloor(pos.x, chunkSize), @divFloor(pos.y, chunkSize), @divFloor(pos.z, chunkSize)));
 
     if (chunk == null) {
-        addChunk(@divFloor(x, chunkSize), @divFloor(y, chunkSize), @divFloor(z, chunkSize));
-        chunk = map.getPtr(hashingFunc(@divFloor(x, chunkSize), @divFloor(y, chunkSize), @divFloor(z, chunkSize)));
+        addChunk(@divFloor(pos.x, chunkSize), @divFloor(pos.y, chunkSize), @divFloor(pos.z, chunkSize));
+        chunk = map.getPtr(hashingFunc(@divFloor(pos.x, chunkSize), @divFloor(pos.y, chunkSize), @divFloor(pos.z, chunkSize)));
     }
 
-    if(@mod(x, chunkSize) - chunkSize == 0){
+    if(@mod(pos.x, chunkSize) - chunkSize == 0){
         print("border ", .{});
     }
 
-    chunk.?.*.Blocks[@intCast(@mod(x, chunkSize))][@intCast(@mod(y, chunkSize))][@intCast(@mod(z, chunkSize))] = b;
+    chunk.?.*.Blocks[@intCast(@mod(pos.x, chunkSize))][@intCast(@mod(pos.y, chunkSize))][@intCast(@mod(pos.z, chunkSize))] = b;
     chunk.?.*.Dirty = true;
 }
 
