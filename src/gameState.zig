@@ -25,6 +25,8 @@ pub fn render() !void {
     map.draw();
     player.render();
     profiler.time("time");
+}
 
+pub fn render2D() !void {
     mapGen.render();
 }

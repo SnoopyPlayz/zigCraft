@@ -49,7 +49,17 @@ pub fn update() void{
     while(mapIter.next()) |chunk|{
         if(chunk.value_ptr.Model == null)
             continue;
-        
+
+        // optimization. only chunks close
+        const chunkPos = ray.Vector3Scale(map.chunkPosFromHash(chunk.key_ptr.*), map.chunkSize);
+
+
+        const distance = ray.Vector3Distance(ray.Vector3Add(chunkPos, .{.x = map.chunkSize / 2, .y = map.chunkSize / 2, .z = map.chunkSize / 2}), camera.position);
+
+        if(distance > 20){
+            continue;
+        }
+
         //ray.Vector3Scale(map.chunkPosFromHash(chunk.key_ptr.*), 32);
         //chunk.value_ptr.Model.?.transform);//
         

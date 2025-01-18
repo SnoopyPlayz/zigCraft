@@ -52,11 +52,12 @@ pub fn updateKeysPressed() void {
     }
 }
 
+// TODO make better
 pub fn toVec3(pos: anytype) ray.Vector3{
-    const T = @TypeOf(pos[0]);
-
-    if(T == ray.Vector3)
+    if(@TypeOf(pos) == ray.Vector3)
         return pos;
+
+    const T = @TypeOf(pos[0]);
 
     if(T == comptime_int or T == u32 or T == u64 or T == u8 or T == usize)
         return ray.Vector3{.x = @floatFromInt(pos[0]), .y = @floatFromInt(pos[1]), .z = @floatFromInt(pos[2])};
@@ -69,10 +70,10 @@ pub const Vector3Int = struct{
 };
 
 pub fn toIntVec3(pos: anytype) Vector3Int{
-    const T = @TypeOf(pos[0]);
-
-    if(T == Vector3Int)
+    if(@TypeOf(pos) == Vector3Int)
         return pos;
+
+    const T = @TypeOf(pos[0]);
 
     if(T == comptime_float or T == f32 or T == f64 or T == f16)
         return Vector3Int{.x = @intFromFloat(pos[0]), .y = @intFromFloat(pos[1]), .z = @intFromFloat(pos[2])};

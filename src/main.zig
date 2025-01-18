@@ -8,22 +8,7 @@ const profiler = @import("profiler.zig");
 const getTimeMili = @import("profiler.zig").getTimeMili;
 const print = std.debug.print;
 
-fn testr(pos: anytype) ray.Vector3{
-    if(@TypeOf(pos) == ray.Vector3)
-        return pos;
-
-    if(@TypeOf(pos[0]) == comptime_int or @TypeOf(pos[0]) == u32 or @TypeOf(pos[0]) == u64 or @TypeOf(pos[0]) == u8)
-        return ray.Vector3{.x = @floatFromInt(pos[0]), .y = @floatFromInt(pos[1]), .z = @floatFromInt(pos[2])};
-
-    return ray.Vector3{.x = @floatCast(pos[0]), .y = @floatCast(pos[1]), .z = @floatCast(pos[2])};
-}
-
 pub fn main() !void {
-    _ = testr(ray.Vector3{.x = 0, .y = 2, .z = 1});
-    _ = testr(.{2,3,4});
-    _ = testr(.{2.1,3.4,4.5});
-
-
     // release enable
     //ray.SetTraceLogLevel(ray.LOG_NONE);
     //ray.SetConfigFlags(ray.FLAG_MSAA_4X_HINT); //| ray.FLAG_WINDOW_RESIZABLE); //| ray.FLAG_WINDOW_HIGHDPI);
@@ -41,6 +26,7 @@ pub fn main() !void {
     shader.setShadowColor(ray.WHITE);
 
     try gameState.init();
+    try gameState.update();
 
     const timePerFrame: f64 = 1.0 / 60.0;
     var lastTime: f64 = getTimeMili();
@@ -60,7 +46,6 @@ pub fn main() !void {
 
         util.updateKeysPressed();
 
-
         ray.UpdateCamera(&p.camera, ray.CAMERA_FREE);
         if(ray.IsKeyDown(ray.KEY_LEFT_SHIFT)){
             ray.UpdateCamera(&p.camera, ray.CAMERA_FREE);
@@ -77,6 +62,7 @@ pub fn main() !void {
         ray.BeginMode3D(p.camera);
         try gameState.render();
         ray.EndMode3D();
+        try gameState.render2D();
 
         profiler.update();
 
