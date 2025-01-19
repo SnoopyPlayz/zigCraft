@@ -123,7 +123,6 @@ const Chunk = struct {
             .indices = @ptrCast(try util.allocator.alloc(u16, indsList.items.len)), 
             .texcoords = @ptrCast(try util.allocator.alloc(f32, texList.items.len)), 
             .texcoords2 = null, .normals = null, .tangents = null, .colors = null, .animVertices = null, .animNormals = null, .boneIds = null, .boneWeights = null, .vaoId = 0, .vboId = null };
-
         // remove extra capacity
         for (0..indsList.items.len) |e| mesh.indices[e] = indsList.items[@intCast(e)];
         for (0..vertList.items.len) |e| mesh.vertices[e] = vertList.items[@intCast(e)];
@@ -142,23 +141,21 @@ pub var map = std.AutoHashMap(u96, Chunk).init(util.allocator);
 
 pub fn draw() void {
     var mapIter = map.iterator();
-    for (0..5) |x|{
-        for (0..5) |y|{
-            for (0..5) |z|{
-                var pos = util.toVec3(.{x, y, z});
-                pos = ray.Vector3Scale(pos, chunkSize);
-                pos = ray.Vector3AddValue(pos, (chunkSize / 2));
-                pos = ray.Vector3AddValue(pos, -0.5);
-                ray.DrawCubeWires(pos, chunkSize, chunkSize, chunkSize, ray.WHITE);
-            }
-        }
-    }
+//    for (0..5) |x|{
+//        for (0..5) |y|{
+//            for (0..5) |z|{
+//                var pos = util.toVec3(.{x, y, z});
+//                pos = ray.Vector3Scale(pos, chunkSize);
+//                pos = ray.Vector3AddValue(pos, (chunkSize / 2));
+//                pos = ray.Vector3AddValue(pos, -0.5);
+//                ray.DrawCubeWires(pos, chunkSize, chunkSize, chunkSize, ray.WHITE);
+//            }
+//        }
+//    }
 
-    var i: u32 = 0;
     while (mapIter.next()) |chunk| {
         if (chunk.value_ptr.Model == null) continue;
         if (!cull.isChunkVisible(ray.Vector3Scale(chunkPosFromHash(chunk.key_ptr.*), chunkSize))) continue;
-        i+=1;
         ray.DrawModel(chunk.value_ptr.Model.?, ray.Vector3Zero(), 1, ray.WHITE);
     }
     //print(" {} \n", .{i});
