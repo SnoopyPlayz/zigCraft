@@ -1,0 +1,7 @@
+
+linux:
+zig build -Doptimize=ReleaseFast --release=fast
+strip binary
+
+windows:
+zig build -Doptimize=ReleaseFast --release=fast -Dtarget=x86_64-windows
