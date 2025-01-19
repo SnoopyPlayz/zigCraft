@@ -1,6 +1,7 @@
 const map = @import("map.zig");
 const util = @import("rayUtils.zig");
 const shader = @import("shader.zig");
+const mapGen = @import("mapGenerator.zig");
 const ray = @import("raylib.zig");
 const std = @import("std");
 const print = std.debug.print;
@@ -27,6 +28,15 @@ pub fn update() void{
 //    camera.position = shader.lightCam.position;
 //    camera.fovy = shader.lightCam.fovy;
 //    camera.projection = shader.lightCam.projection;
+//
+    //print("{} \n",.{map.toChunkPos(.{camera.position.x, 0, camera.position.z})});
+
+    if(map.getChunk(map.toChunkPos(.{camera.position.x, 0, camera.position.z})) == null){
+        mapGen.gen(map.toChunkPos(.{camera.position.x, 0, camera.position.z}));
+    }else if(map.getChunk(map.toChunkPos(.{camera.position.x, 0, camera.position.z})).?.Generated == false){
+        mapGen.gen(map.toChunkPos(.{camera.position.x, 0, camera.position.z}));
+    }
+    
     if(ray.IsKeyDown(ray.KEY_K)){
         shader.lightCam.target.z += 0.01;
     }

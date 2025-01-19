@@ -27,5 +27,4 @@ pub fn render() !void {
 }
 
 pub fn render2D() !void {
-    mapGen.render();
 }

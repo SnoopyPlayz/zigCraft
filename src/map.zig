@@ -13,6 +13,7 @@ const Chunk = struct {
     Blocks: [chunkSize][chunkSize][chunkSize]u8,
     Model: ?ray.Model = null,
     Dirty: bool = false,
+    Generated: bool = false,
 
     fn genMesh(self: *Chunk, pos: ray.Vector3) !void {
         const chunkPosWorld = ray.Vector3Scale(pos, chunkSize);
@@ -160,7 +161,7 @@ pub fn draw() void {
         i+=1;
         ray.DrawModel(chunk.value_ptr.Model.?, ray.Vector3Zero(), 1, ray.WHITE);
     }
-    print(" {} \n", .{i});
+    //print(" {} \n", .{i});
 }
 
 pub fn update() void {
@@ -214,18 +215,28 @@ pub fn getBlock(position: anytype) u8 {
     return chunk.?.Blocks[@intCast(@mod(pos.x, chunkSize))][@intCast(@mod(pos.y, chunkSize))][@intCast(@mod(pos.z, chunkSize))];
 }
 
+pub fn toChunkPos(position: anytype) ray.Vector3{
+    const pos = util.toIntVec3(position);
+    return util.toVec3(.{@divFloor(pos.x, chunkSize), @divFloor(pos.y, chunkSize), @divFloor(pos.z, chunkSize)});
+}
+
+pub fn toWorldPos(position: anytype) ray.Vector3{
+    const pos = util.toVec3(position);
+    return util.toVec3(.{pos.x * chunkSize, pos.y * chunkSize, pos.z * chunkSize});
+}
+
 pub fn getChunk(position: anytype) ?*Chunk {
     const pos = util.toIntVec3(position);
-    return map.getPtr(hashingFunc(@divFloor(pos.x, chunkSize), @divFloor(pos.y, chunkSize), @divFloor(pos.z, chunkSize)));
+    return map.getPtr(hashingFunc(pos.x, pos.y, pos.z));
 }
 
 pub fn setBlock(position: anytype, b: u8) void {
     const pos = util.toIntVec3(position);
-    var chunk = getChunk(pos);
+    var chunk = getChunk(toChunkPos(pos));
 
     if (chunk == null) {
-        addChunk(@divFloor(pos.x, chunkSize), @divFloor(pos.y, chunkSize), @divFloor(pos.z, chunkSize));
-        chunk = getChunk(pos);
+        addChunk(toChunkPos(pos));
+        chunk = getChunk(toChunkPos(pos));
     }
 
     chunk.?.*.Blocks[@intCast(@mod(pos.x, chunkSize))][@intCast(@mod(pos.y, chunkSize))][@intCast(@mod(pos.z, chunkSize))] = b;
@@ -233,6 +244,7 @@ pub fn setBlock(position: anytype, b: u8) void {
 }
 
 const emptyChunk = undefined;
-fn addChunk(x: i32, y: i32, z: i32) void {
-    map.put(hashingFunc(x, y, z), emptyChunk) catch |err| print("cannot addChunk {}", .{err});
+pub fn addChunk(position: anytype) void {
+    const pos = util.toIntVec3(position);
+    map.put(hashingFunc(pos.x, pos.y, pos.z), emptyChunk) catch |err| print("cannot addChunk {}", .{err});
 }

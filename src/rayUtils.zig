@@ -59,7 +59,7 @@ pub fn toVec3(pos: anytype) ray.Vector3{
 
     const T = @TypeOf(pos[0]);
 
-    if(T == comptime_int or T == u32 or T == u64 or T == u8 or T == usize)
+    if(T == comptime_int or T == u32 or T == u64 or T == u8 or T == usize or T == i32)
         return ray.Vector3{.x = @floatFromInt(pos[0]), .y = @floatFromInt(pos[1]), .z = @floatFromInt(pos[2])};
 
     return ray.Vector3{.x = @floatCast(pos[0]), .y = @floatCast(pos[1]), .z = @floatCast(pos[2])};
@@ -72,6 +72,9 @@ pub const Vector3Int = struct{
 pub fn toIntVec3(pos: anytype) Vector3Int{
     if(@TypeOf(pos) == Vector3Int)
         return pos;
+
+    if(@TypeOf(pos) == ray.Vector3)
+        return Vector3Int{.x = @intFromFloat(pos.x), .y = @intFromFloat(pos.y), .z = @intFromFloat(pos.z)};
 
     const T = @TypeOf(pos[0]);
 
