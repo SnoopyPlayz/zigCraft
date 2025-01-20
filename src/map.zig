@@ -141,17 +141,17 @@ pub var map = std.AutoHashMap(u96, Chunk).init(util.allocator);
 
 pub fn draw() void {
     var mapIter = map.iterator();
-//    for (0..5) |x|{
-//        for (0..5) |y|{
-//            for (0..5) |z|{
-//                var pos = util.toVec3(.{x, y, z});
-//                pos = ray.Vector3Scale(pos, chunkSize);
-//                pos = ray.Vector3AddValue(pos, (chunkSize / 2));
-//                pos = ray.Vector3AddValue(pos, -0.5);
-//                ray.DrawCubeWires(pos, chunkSize, chunkSize, chunkSize, ray.WHITE);
-//            }
-//        }
-//    }
+    for (0..5) |x|{
+        for (0..5) |y|{
+            for (0..5) |z|{
+                var pos = util.toVec3(.{x, y, z});
+                pos = ray.Vector3Scale(pos, chunkSize);
+                pos = ray.Vector3AddValue(pos, (chunkSize / 2));
+                pos = ray.Vector3AddValue(pos, -0.5);
+                ray.DrawCubeWires(pos, chunkSize, chunkSize, chunkSize, ray.WHITE);
+            }
+        }
+    }
 
     while (mapIter.next()) |chunk| {
         if (chunk.value_ptr.Model == null) continue;
@@ -226,18 +226,30 @@ pub fn getChunk(position: anytype) ?*Chunk {
     const pos = util.toIntVec3(position);
     return map.getPtr(hashingFunc(pos.x, pos.y, pos.z));
 }
+// gen if there is no chunk
+pub fn getChunkOrGen(position: anytype) *Chunk {
+    const pos = util.toIntVec3(position);
+    if(map.getPtr(hashingFunc(pos.x, pos.y, pos.z)) == null){
+        addChunk(pos);
+    }
+    return map.getPtr(hashingFunc(pos.x, pos.y, pos.z)).?;
+}
 
 pub fn setBlock(position: anytype, b: u8) void {
     const pos = util.toIntVec3(position);
-    var chunk = getChunk(toChunkPos(pos));
+    const chunk = getChunkOrGen(toChunkPos(pos));
 
-    if (chunk == null) {
-        addChunk(toChunkPos(pos));
-        chunk = getChunk(toChunkPos(pos));
-    }
+    // update Chunks around block that is updated
+    if(getBlock(.{pos.x, pos.y + 1, pos.z}) != 0) getChunkOrGen(toChunkPos(.{pos.x, pos.y + 1, pos.z})).*.Dirty = true;
+    if(getBlock(.{pos.x, pos.y - 1, pos.z}) != 0) getChunkOrGen(toChunkPos(.{pos.x, pos.y - 1, pos.z})).*.Dirty = true;
+    if(getBlock(.{pos.x + 1, pos.y, pos.z}) != 0) getChunkOrGen(toChunkPos(.{pos.x + 1, pos.y, pos.z})).*.Dirty = true;
+    if(getBlock(.{pos.x - 1, pos.y, pos.z}) != 0) getChunkOrGen(toChunkPos(.{pos.x - 1, pos.y, pos.z})).*.Dirty = true;
+    if(getBlock(.{pos.x, pos.y, pos.z + 1}) != 0) getChunkOrGen(toChunkPos(.{pos.x, pos.y, pos.z + 1})).*.Dirty = true;
+    if(getBlock(.{pos.x, pos.y, pos.z - 1}) != 0) getChunkOrGen(toChunkPos(.{pos.x, pos.y, pos.z - 1})).*.Dirty = true;
+    //getChunkOrGen(toChunkPos(.{pos.x, pos.y + 1, pos.z})).*.Dirty = if (getBlock(.{pos.x, pos.y + 1, pos.z}) != 0) true else false;
 
-    chunk.?.*.Blocks[@intCast(@mod(pos.x, chunkSize))][@intCast(@mod(pos.y, chunkSize))][@intCast(@mod(pos.z, chunkSize))] = b;
-    chunk.?.*.Dirty = true;
+    chunk.*.Blocks[@intCast(@mod(pos.x, chunkSize))][@intCast(@mod(pos.y, chunkSize))][@intCast(@mod(pos.z, chunkSize))] = b;
+    chunk.*.Dirty = true;
 }
 
 const emptyChunk = undefined;
