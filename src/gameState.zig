@@ -16,7 +16,7 @@ pub fn update() !void {
 }
 
 pub fn init() !void {
-    mapGen.init();
+    try mapGen.init();
 }
 
 pub fn render() !void {
