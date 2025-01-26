@@ -32,8 +32,8 @@ const Chunk = struct {
                     if (self.Blocks[x][y][z] == 0)
                         continue;
 
-                    const blockPosChunk = util.toVec3(.{x, y, z});//ray.Vector3{ .x = @floatFromInt(x), .y = @floatFromInt(y), .z = @floatFromInt(z) };
-                    const bw = ray.Vector3Add(chunkPosWorld, blockPosChunk);
+                    const bc = util.toVec3(.{x, y, z});//ray.Vector3{ .x = @floatFromInt(x), .y = @floatFromInt(y), .z = @floatFromInt(z) };
+                    const bw = ray.Vector3Add(chunkPosWorld, bc);
 
                     const tSize = 1.0 / 16.0; //tile size
                     const xt = tSize * @as(f32, @floatFromInt(getBlock(.{bw.x, bw.y, bw.z}) - 1));
@@ -41,7 +41,7 @@ const Chunk = struct {
 
                     // up face
                     if (isTransparent(getBlock(.{bw.x, bw.y + 1, bw.z}))) {
-                        const vert = [_]f32{ bw.x + -0.5, bw.y + 0.5, bw.z + -0.5, bw.x + 0.5, bw.y + 0.5, bw.z + -0.5, bw.x + 0.5, bw.y + 0.5, bw.z + 0.5, bw.x + -0.5, bw.y + 0.5, bw.z + 0.5 };
+                        const vert = [_]f32{ bc.x + -0.5, bc.y + 0.5, bc.z + -0.5, bc.x + 0.5, bc.y + 0.5, bc.z + -0.5, bc.x + 0.5, bc.y + 0.5, bc.z + 0.5, bc.x + -0.5, bc.y + 0.5, bc.z + 0.5 };
                         const inds = [_]u16{ indsOffset, indsOffset + 2, indsOffset + 1, indsOffset, indsOffset + 3, indsOffset + 2 };
 
                         vertList.appendSlice(&vert) catch {};
@@ -51,7 +51,7 @@ const Chunk = struct {
                     }
 
                     if (isTransparent(getBlock(.{bw.x, bw.y - 1, bw.z}))) {
-                        const vert = [_]f32{ bw.x + -0.5, bw.y + -0.5, bw.z + -0.5, bw.x + 0.5, bw.y + -0.5, bw.z + -0.5, bw.x + 0.5, bw.y + -0.5, bw.z + 0.5, bw.x + -0.5, bw.y + -0.5, bw.z + 0.5 };
+                        const vert = [_]f32{ bc.x + -0.5, bc.y + -0.5, bc.z + -0.5, bc.x + 0.5, bc.y + -0.5, bc.z + -0.5, bc.x + 0.5, bc.y + -0.5, bc.z + 0.5, bc.x + -0.5, bc.y + -0.5, bc.z + 0.5 };
                         const inds = [_]u16{ indsOffset, indsOffset + 1, indsOffset + 2, indsOffset, indsOffset + 2, indsOffset + 3 };
 
                         vertList.appendSlice(&vert) catch {};
@@ -61,7 +61,7 @@ const Chunk = struct {
                     }
 
                     if (isTransparent(getBlock(.{bw.x, bw.y, bw.z + 1}))) {
-                        const vert = [_]f32{ bw.x + -0.5, bw.y + -0.5, bw.z + 0.5, bw.x + 0.5, bw.y + -0.5, bw.z + 0.5, bw.x + 0.5, bw.y + 0.5, bw.z + 0.5, bw.x + -0.5, bw.y + 0.5, bw.z + 0.5 };
+                        const vert = [_]f32{ bc.x + -0.5, bc.y + -0.5, bc.z + 0.5, bc.x + 0.5, bc.y + -0.5, bc.z + 0.5, bc.x + 0.5, bc.y + 0.5, bc.z + 0.5, bc.x + -0.5, bc.y + 0.5, bc.z + 0.5 };
                         const inds = [_]u16{ indsOffset, indsOffset + 1, indsOffset + 2, indsOffset, indsOffset + 2, indsOffset + 3 };
 
                         vertList.appendSlice(&vert) catch {};
@@ -71,7 +71,7 @@ const Chunk = struct {
                     }
 
                     if (isTransparent(getBlock(.{bw.x, bw.y, bw.z - 1}))) {
-                        const vert = [_]f32{ bw.x + -0.5, bw.y + -0.5, bw.z + -0.5, bw.x + 0.5, bw.y + -0.5, bw.z + -0.5, bw.x + 0.5, bw.y + 0.5, bw.z + -0.5, bw.x + -0.5, bw.y + 0.5, bw.z + -0.5 };
+                        const vert = [_]f32{ bc.x + -0.5, bc.y + -0.5, bc.z + -0.5, bc.x + 0.5, bc.y + -0.5, bc.z + -0.5, bc.x + 0.5, bc.y + 0.5, bc.z + -0.5, bc.x + -0.5, bc.y + 0.5, bc.z + -0.5 };
                         const inds = [_]u16{ indsOffset, indsOffset + 2, indsOffset + 1, indsOffset, indsOffset + 3, indsOffset + 2 };
 
                         vertList.appendSlice(&vert) catch {};
@@ -81,7 +81,7 @@ const Chunk = struct {
                     }
 
                     if (isTransparent(getBlock(.{bw.x + 1, bw.y, bw.z}))) {
-                        const vert = [_]f32{ bw.x + 0.5, bw.y + -0.5, bw.z + -0.5, bw.x + 0.5, bw.y + -0.5, bw.z + 0.5, bw.x + 0.5, bw.y + 0.5, bw.z + 0.5, bw.x + 0.5, bw.y + 0.5, bw.z + -0.5 };
+                        const vert = [_]f32{ bc.x + 0.5, bc.y + -0.5, bc.z + -0.5, bc.x + 0.5, bc.y + -0.5, bc.z + 0.5, bc.x + 0.5, bc.y + 0.5, bc.z + 0.5, bc.x + 0.5, bc.y + 0.5, bc.z + -0.5 };
                         const inds = [_]u16{ indsOffset, indsOffset + 2, indsOffset + 1, indsOffset, indsOffset + 3, indsOffset + 2 };
 
                         vertList.appendSlice(&vert) catch {};
@@ -91,7 +91,7 @@ const Chunk = struct {
                     }
 
                     if (isTransparent(getBlock(.{bw.x - 1, bw.y, bw.z}))) {
-                        const vert = [_]f32{ bw.x + -0.5, bw.y + -0.5, bw.z + -0.5, bw.x + -0.5, bw.y + -0.5, bw.z + 0.5, bw.x + -0.5, bw.y + 0.5, bw.z + 0.5, bw.x + -0.5, bw.y + 0.5, bw.z + -0.5 };
+                        const vert = [_]f32{ bc.x + -0.5, bc.y + -0.5, bc.z + -0.5, bc.x + -0.5, bc.y + -0.5, bc.z + 0.5, bc.x + -0.5, bc.y + 0.5, bc.z + 0.5, bc.x + -0.5, bc.y + 0.5, bc.z + -0.5 };
                         const inds = [_]u16{ indsOffset, indsOffset + 1, indsOffset + 2, indsOffset, indsOffset + 2, indsOffset + 3 };
 
                         vertList.appendSlice(&vert) catch {};
@@ -128,6 +128,18 @@ const Chunk = struct {
         for (0..vertList.items.len) |e| mesh.vertices[e] = vertList.items[@intCast(e)];
         for (0..texList.items.len) |e| mesh.texcoords[e] = texList.items[@intCast(e)];
 
+//        
+//        const vao = ray.rlLoadVertexArray();
+//        _ = ray.rlEnableVertexArray(vao);
+//        
+//        const verts:[*c] u32 = @ptrCast(try util.allocator.alloc(f32, vertList.items.len));
+//        vao = ray.rlLoadVertexBuffer(verts, vertList.items.len * 32, false);
+//        
+//        ray.rlSetVertexAttribute(0, 1, 0x1405, false, 32, 0);
+//        ray.rlEnableVertexAttribute(0);
+//
+//        ray.rlDisableVertexArray();
+//
         ray.UploadMesh(&mesh, false);
 
         self.Model = ray.LoadModelFromMesh(mesh);
@@ -156,7 +168,7 @@ pub fn draw() void {
     while (mapIter.next()) |chunk| {
         if (chunk.value_ptr.Model == null) continue;
         if (!cull.isChunkVisible(ray.Vector3Scale(chunkPosFromHash(chunk.key_ptr.*), chunkSize))) continue;
-        ray.DrawModel(chunk.value_ptr.Model.?, ray.Vector3Zero(), 1, ray.WHITE);
+        ray.DrawModel(chunk.value_ptr.Model.?, toWorldPos(chunkPosFromHash(chunk.key_ptr.*)), 1, ray.WHITE);
     }
     //print(" {} \n", .{i});
 }
@@ -172,7 +184,7 @@ pub fn update() void {
 }
 
 fn isTransparent(i: u8) bool{
-    if(i == 0 or i == 2)
+    if(i == 0 or i == 2 or i == 6)
         return true;
     return false;
 }

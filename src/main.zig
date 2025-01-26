@@ -27,7 +27,7 @@ pub fn main() !void {
 
     try gameState.init();
     try gameState.update();
-
+    
     const timePerFrame: f64 = 1.0 / 60.0;
     var lastTime: f64 = getTimeMili();
 

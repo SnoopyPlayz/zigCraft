@@ -41,6 +41,10 @@ pub fn update() void{
         shader.lightCam.target.z += 0.01;
     }
 
+    if(util.IsKeyPressed(ray.KEY_X)){
+        mapGen.createTree(camera.position);
+    }
+
     if(ray.IsKeyDown(ray.KEY_L)){
         shader.lightCam.target.z -= 0.01;
     }
@@ -61,8 +65,7 @@ pub fn update() void{
             continue;
 
         // optimization. only chunks close
-        const chunkPos = ray.Vector3Scale(map.chunkPosFromHash(chunk.key_ptr.*), map.chunkSize);
-
+        const chunkPos = map.toWorldPos(map.chunkPosFromHash(chunk.key_ptr.*));
 
         const distance = ray.Vector3Distance(ray.Vector3Add(chunkPos, .{.x = map.chunkSize / 2, .y = map.chunkSize / 2, .z = map.chunkSize / 2}), camera.position);
 
@@ -70,19 +73,12 @@ pub fn update() void{
             continue;
         }
 
-        //ray.Vector3Scale(map.chunkPosFromHash(chunk.key_ptr.*), 32);
-        //chunk.value_ptr.Model.?.transform);//
-        
-        const meshHitInfo = ray.GetRayCollisionMesh(raycast, chunk.value_ptr.Model.?.meshes[0], ray.MatrixTranslate(0,0,0));
-        //print("chunk {} \n",.{chunk.value_ptr.Model.?.transform});
+        const meshHitInfo = ray.GetRayCollisionMesh(raycast, chunk.value_ptr.Model.?.meshes[0], ray.MatrixTranslate(chunkPos.x, chunkPos.y, chunkPos.z));
 
         if(meshHitInfo.hit and meshHitInfo.distance < 5 and meshHitInfo.distance < col.distance){
             col = meshHitInfo;
         }
-
-        //print("distance: {d:12} \n", .{col.distance});
     }
-    //print("new :  \n", .{});
 
     if(col.hit){
         const pointa = ray.Vector3Add(col.point, ray.Vector3Scale(col.normal, 0.5));

@@ -47,8 +47,13 @@ pub fn gen(position: anytype) void {
                 map.setBlock(.{setBlockPos.x + pos.x, height - @as(i32, @intCast(h)), setBlockPos.z + pos.z}, 4);
             }
             map.setBlock(.{setBlockPos.x + pos.x, height, setBlockPos.z + pos.z}, 1);
+
+            if(ray.GetRandomValue(0, 100) == 1){
+                createTree(.{setBlockPos.x + pos.x, height, setBlockPos.z + pos.z});
+            }
         }
     }
+
     map.getChunk(position).?.Generated = true;
 }
 
@@ -58,4 +63,27 @@ pub fn init() void {
             gen(.{i, 0, y});
         }
     }
+}
+
+pub fn createTree(position: anytype) void {
+    const pos = util.toVec3(position);
+     
+    map.setBlock(pos, 1);
+
+    for(0..3)|i|{
+        const x: f32 = @floatFromInt(i);
+        for(0..3)|t|{
+            const y: f32 = @floatFromInt(t);
+            for(0..3)|q|{
+                const z: f32 = @floatFromInt(q);
+                map.setBlock(.{pos.x + x - 1, pos.y + 4 + y, pos.z + z - 1}, 6);
+            }
+        }
+    }
+
+    for(0..5)|i|{
+        const h: f32 = @floatFromInt(i);
+        map.setBlock(.{pos.x, pos.y + h, pos.z}, 5);
+    }
+
 }

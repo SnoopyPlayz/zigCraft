@@ -13,6 +13,7 @@ pub fn build(b: *std.Build) !void {
     const raylib = raylib_dep.module("raylib");
     const raylib_artifact = raylib_dep.artifact("raylib");
 
+
     //web exports are completely separate
     if (target.query.os_tag == .emscripten) {
         const exe_lib = try rlz.emcc.compileForEmscripten(b, "ZIS3D", "src/main.zig", target, optimize);
@@ -35,6 +36,8 @@ pub fn build(b: *std.Build) !void {
     }
 
     const exe = b.addExecutable(.{ .name = "ZIS3D", .root_source_file = b.path("src/main.zig"), .optimize = optimize, .target = target });
+
+    //exe.addCSourceFile(.{ .file = b.path("src/rmodels.c"), .flags = &.{""} });
 
     exe.linkLibrary(raylib_artifact);
     exe.root_module.addImport("raylib", raylib);

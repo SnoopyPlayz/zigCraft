@@ -59,7 +59,7 @@ pub fn toVec3(pos: anytype) ray.Vector3{
 
     const T = @TypeOf(pos[0]);
 
-    if(T == comptime_int or T == u32 or T == u64 or T == u8 or T == usize or T == i32)
+    if(T == comptime_int or T == u32 or T == u64 or T == u8 or T == usize or T == i32 or T == c_int)
         return ray.Vector3{.x = @floatFromInt(pos[0]), .y = @floatFromInt(pos[1]), .z = @floatFromInt(pos[2])};
 
     return ray.Vector3{.x = @floatCast(pos[0]), .y = @floatCast(pos[1]), .z = @floatCast(pos[2])};
