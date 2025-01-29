@@ -140,6 +140,7 @@ const Chunk = struct {
 //
 //        ray.rlDisableVertexArray();
 //
+        //try model.UploadMesh(&mesh, false);
         ray.UploadMesh(&mesh, false);
 
         self.Model = ray.LoadModelFromMesh(mesh);

@@ -74,8 +74,10 @@ fn ExtractFrustum(frustum: *[6]ray.Vector4) void{
 }
 
 pub fn isChunkVisible(position: anytype) bool{
-    const min = util.toVec3(position);
-    const max = ray.Vector3Add(min, .{.x = map.chunkSize, .y = map.chunkSize, .z = map.chunkSize});
+    const offset = 0.5;
+
+    const min = ray.Vector3Subtract(util.toVec3(position), .{.x = offset, .y = offset, .z = offset});
+    const max = ray.Vector3Add(ray.Vector3Add(min, .{.x = map.chunkSize, .y = map.chunkSize, .z = map.chunkSize}), .{.x = offset * 2, .y = offset * 2, .z = offset * 2});
 
     const pojMatrix = ray.GetCameraMatrix(player.camera);
 
