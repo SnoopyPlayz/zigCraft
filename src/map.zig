@@ -128,20 +128,7 @@ const Chunk = struct {
         for (0..vertList.items.len) |e| mesh.vertices[e] = vertList.items[@intCast(e)];
         for (0..texList.items.len) |e| mesh.texcoords[e] = texList.items[@intCast(e)];
 
-//        
-//        const vao = ray.rlLoadVertexArray();
-//        _ = ray.rlEnableVertexArray(vao);
-//        
-//        const verts:[*c] u32 = @ptrCast(try util.allocator.alloc(f32, vertList.items.len));
-//        vao = ray.rlLoadVertexBuffer(verts, vertList.items.len * 32, false);
-//        
-//        ray.rlSetVertexAttribute(0, 1, 0x1405, false, 32, 0);
-//        ray.rlEnableVertexAttribute(0);
-//
-//        ray.rlDisableVertexArray();
-//
-        //try model.UploadMesh(&mesh, false);
-        ray.UploadMesh(&mesh, false);
+        try model.UploadMesh(&mesh, false);
 
         self.Model = ray.LoadModelFromMesh(mesh);
 

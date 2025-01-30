@@ -70,7 +70,7 @@ pub fn UploadMesh(mesh: *ray.Mesh, dynamic: bool) !void {
     // Default vertex attribute: normal
     // WARNING: Default value provided to shader if location available
     {
-    const value = [_]i32{ 1.0, 1.0, 1.0 };
+    const value = [_]f32{ 1.0, 1.0, 1.0 };
     ray.rlSetVertexAttributeDefault(ray.RL_DEFAULT_SHADER_ATTRIB_LOCATION_NORMAL, &value, ray.SHADER_ATTRIB_VEC3, 3);
     ray.rlDisableVertexAttribute(ray.RL_DEFAULT_SHADER_ATTRIB_LOCATION_NORMAL);
     }
@@ -78,7 +78,7 @@ pub fn UploadMesh(mesh: *ray.Mesh, dynamic: bool) !void {
     // Default vertex attribute: color
     // WARNING: Default value provided to shader if location available
     {
-    const value = [_]i32 { 1.0, 1.0, 1.0, 1.0 };    // WHITE
+    const value = [_]f32 { 1.0, 1.0, 1.0, 1.0 };    // WHITE
     ray.rlSetVertexAttributeDefault(ray.RL_DEFAULT_SHADER_ATTRIB_LOCATION_COLOR, &value, ray.SHADER_ATTRIB_VEC4, 4);
     ray.rlDisableVertexAttribute(ray.RL_DEFAULT_SHADER_ATTRIB_LOCATION_COLOR);
     }
@@ -88,7 +88,7 @@ pub fn UploadMesh(mesh: *ray.Mesh, dynamic: bool) !void {
     // Default vertex attribute: tangent
     // WARNING: Default value provided to shader if location available
     {
-    const value = [_]i32 { 0.0, 0.0, 0.0, 0.0 };
+    const value = [_]f32 { 0.0, 0.0, 0.0, 0.0 };
     ray.rlSetVertexAttributeDefault(ray.RL_DEFAULT_SHADER_ATTRIB_LOCATION_TANGENT, &value, ray.SHADER_ATTRIB_VEC4, 4);
     ray.rlDisableVertexAttribute(ray.RL_DEFAULT_SHADER_ATTRIB_LOCATION_TANGENT);
     }
@@ -98,16 +98,12 @@ pub fn UploadMesh(mesh: *ray.Mesh, dynamic: bool) !void {
     // Default vertex attribute: texcoord2
     // WARNING: Default value provided to shader if location available
     {
-    const value = [_]i32 { 0.0, 0.0 };
+    const value = [_]f32 { 0.0, 0.0 };
     ray.rlSetVertexAttributeDefault(ray.RL_DEFAULT_SHADER_ATTRIB_LOCATION_TEXCOORD2, &value, ray.SHADER_ATTRIB_VEC2, 2);
     ray.rlDisableVertexAttribute(ray.RL_DEFAULT_SHADER_ATTRIB_LOCATION_TEXCOORD2);
     }
-    
 
-    if (mesh.indices != null)
-    {
-        mesh.vboId[ray.RL_DEFAULT_SHADER_ATTRIB_LOCATION_INDICES] = ray.rlLoadVertexBufferElement(mesh.indices, mesh.triangleCount*3*@sizeOf(u16), dynamic);
-    }
+    mesh.vboId[ray.RL_DEFAULT_SHADER_ATTRIB_LOCATION_INDICES] = ray.rlLoadVertexBufferElement(mesh.indices, mesh.triangleCount*3*@sizeOf(u16), dynamic);
 
     if (mesh.vaoId > 0){
         print("INFO: VAO: [ID {}] Mesh uploaded successfully to VRAM (GPU) \n",.{mesh.vaoId});
