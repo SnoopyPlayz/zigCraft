@@ -20,7 +20,7 @@ const Chunk = struct {
 
         var vertList = std.ArrayList(f32).init(util.allocator);
         var indsList = std.ArrayList(u16).init(util.allocator);
-        var texList = std.ArrayList(f32).init(util.allocator);
+        var texList = std.ArrayList(u8).init(util.allocator);
         defer vertList.deinit();
         defer indsList.deinit();
         defer texList.deinit();
@@ -32,15 +32,17 @@ const Chunk = struct {
                     if (self.Blocks[x][y][z] == 0)
                         continue;
 
-                    const bc = util.toVec3(.{x, y, z});//ray.Vector3{ .x = @floatFromInt(x), .y = @floatFromInt(y), .z = @floatFromInt(z) };
+                    const bc = util.toVec3(.{ x, y, z }); //ray.Vector3{ .x = @floatFromInt(x), .y = @floatFromInt(y), .z = @floatFromInt(z) };
                     const bw = ray.Vector3Add(chunkPosWorld, bc);
 
-                    const tSize = 1.0 / 16.0; //tile size
-                    const xt = tSize * @as(f32, @floatFromInt(getBlock(.{bw.x, bw.y, bw.z}) - 1));
-                    const texCords = [_]f32{ xt, 0.0, tSize + xt, 0.0, tSize + xt, tSize, 0.0 + xt, tSize };
+                    //const tSize = 1;//1.0 / 16.0; //tile size
+                    //const xt = tSize * @as(f32, @floatFromInt(getBlock(.{bw.x, bw.y, bw.z}) - 1));
+                    //const texCords = [_]f32{ xt, 0.0, tSize + xt, 0.0, tSize + xt, tSize, 0.0 + xt, tSize };
+                    const block = getBlock(.{ bw.x, bw.y, bw.z }) - 1;
+                    const texCords = [_]u8{ block, block + 1, block + 18, block + 17};
 
                     // up face
-                    if (isTransparent(getBlock(.{bw.x, bw.y + 1, bw.z}))) {
+                    if (isTransparent(getBlock(.{ bw.x, bw.y + 1, bw.z }))) {
                         const vert = [_]f32{ bc.x + -0.5, bc.y + 0.5, bc.z + -0.5, bc.x + 0.5, bc.y + 0.5, bc.z + -0.5, bc.x + 0.5, bc.y + 0.5, bc.z + 0.5, bc.x + -0.5, bc.y + 0.5, bc.z + 0.5 };
                         const inds = [_]u16{ indsOffset, indsOffset + 2, indsOffset + 1, indsOffset, indsOffset + 3, indsOffset + 2 };
 
@@ -50,7 +52,7 @@ const Chunk = struct {
                         indsOffset += 4;
                     }
 
-                    if (isTransparent(getBlock(.{bw.x, bw.y - 1, bw.z}))) {
+                    if (isTransparent(getBlock(.{ bw.x, bw.y - 1, bw.z }))) {
                         const vert = [_]f32{ bc.x + -0.5, bc.y + -0.5, bc.z + -0.5, bc.x + 0.5, bc.y + -0.5, bc.z + -0.5, bc.x + 0.5, bc.y + -0.5, bc.z + 0.5, bc.x + -0.5, bc.y + -0.5, bc.z + 0.5 };
                         const inds = [_]u16{ indsOffset, indsOffset + 1, indsOffset + 2, indsOffset, indsOffset + 2, indsOffset + 3 };
 
@@ -60,7 +62,7 @@ const Chunk = struct {
                         indsOffset += 4;
                     }
 
-                    if (isTransparent(getBlock(.{bw.x, bw.y, bw.z + 1}))) {
+                    if (isTransparent(getBlock(.{ bw.x, bw.y, bw.z + 1 }))) {
                         const vert = [_]f32{ bc.x + -0.5, bc.y + -0.5, bc.z + 0.5, bc.x + 0.5, bc.y + -0.5, bc.z + 0.5, bc.x + 0.5, bc.y + 0.5, bc.z + 0.5, bc.x + -0.5, bc.y + 0.5, bc.z + 0.5 };
                         const inds = [_]u16{ indsOffset, indsOffset + 1, indsOffset + 2, indsOffset, indsOffset + 2, indsOffset + 3 };
 
@@ -70,7 +72,7 @@ const Chunk = struct {
                         indsOffset += 4;
                     }
 
-                    if (isTransparent(getBlock(.{bw.x, bw.y, bw.z - 1}))) {
+                    if (isTransparent(getBlock(.{ bw.x, bw.y, bw.z - 1 }))) {
                         const vert = [_]f32{ bc.x + -0.5, bc.y + -0.5, bc.z + -0.5, bc.x + 0.5, bc.y + -0.5, bc.z + -0.5, bc.x + 0.5, bc.y + 0.5, bc.z + -0.5, bc.x + -0.5, bc.y + 0.5, bc.z + -0.5 };
                         const inds = [_]u16{ indsOffset, indsOffset + 2, indsOffset + 1, indsOffset, indsOffset + 3, indsOffset + 2 };
 
@@ -80,7 +82,7 @@ const Chunk = struct {
                         indsOffset += 4;
                     }
 
-                    if (isTransparent(getBlock(.{bw.x + 1, bw.y, bw.z}))) {
+                    if (isTransparent(getBlock(.{ bw.x + 1, bw.y, bw.z }))) {
                         const vert = [_]f32{ bc.x + 0.5, bc.y + -0.5, bc.z + -0.5, bc.x + 0.5, bc.y + -0.5, bc.z + 0.5, bc.x + 0.5, bc.y + 0.5, bc.z + 0.5, bc.x + 0.5, bc.y + 0.5, bc.z + -0.5 };
                         const inds = [_]u16{ indsOffset, indsOffset + 2, indsOffset + 1, indsOffset, indsOffset + 3, indsOffset + 2 };
 
@@ -90,7 +92,7 @@ const Chunk = struct {
                         indsOffset += 4;
                     }
 
-                    if (isTransparent(getBlock(.{bw.x - 1, bw.y, bw.z}))) {
+                    if (isTransparent(getBlock(.{ bw.x - 1, bw.y, bw.z }))) {
                         const vert = [_]f32{ bc.x + -0.5, bc.y + -0.5, bc.z + -0.5, bc.x + -0.5, bc.y + -0.5, bc.z + 0.5, bc.x + -0.5, bc.y + 0.5, bc.z + 0.5, bc.x + -0.5, bc.y + 0.5, bc.z + -0.5 };
                         const inds = [_]u16{ indsOffset, indsOffset + 1, indsOffset + 2, indsOffset, indsOffset + 2, indsOffset + 3 };
 
@@ -103,8 +105,8 @@ const Chunk = struct {
             }
         }
 
-        if (vertList.items.len == 0){ //emptyChunk
-            if(self.Model != null){
+        if (vertList.items.len == 0) { //emptyChunk
+            if (self.Model != null) {
                 model.unloadMesh(self.Model.?.meshes[0]);
                 self.Model = null;
             }
@@ -115,20 +117,44 @@ const Chunk = struct {
             model.unloadMesh(self.Model.?.meshes[0]);
         }
 
-        var mesh = ray.Mesh{ 
-            .triangleCount = @intCast(vertList.items.len / 6), 
-            .vertexCount = @intCast(vertList.items.len / 3), 
+        var mesh = ray.Mesh{
+            .triangleCount = @intCast(vertList.items.len / 6),
+            .vertexCount = @intCast(vertList.items.len / 3),
 
-            .vertices = @ptrCast(try util.allocator.alloc(f32, vertList.items.len)), 
-            .indices = @ptrCast(try util.allocator.alloc(u16, indsList.items.len)), 
-            .texcoords = @ptrCast(try util.allocator.alloc(f32, texList.items.len)), 
-            .texcoords2 = null, .normals = null, .tangents = null, .colors = null, .animVertices = null, .animNormals = null, .boneIds = null, .boneWeights = null, .vaoId = 0, .vboId = null };
+            .indices = @ptrCast(try util.allocator.alloc(u16, indsList.items.len)),
+            .vertices = null, .texcoords = null, .texcoords2 = null, .normals = null, .tangents = null, .colors = null, .animVertices = null, .animNormals = null, .boneIds = null, .boneWeights = null, .vaoId = 0, .vboId = null,
+        };
+        var vertlistcap = try util.allocator.alloc(u32, vertList.items.len);
+        var texCoords = try util.allocator.alloc(u8, texList.items.len);
+
         // remove extra capacity
         for (0..indsList.items.len) |e| mesh.indices[e] = indsList.items[@intCast(e)];
-        for (0..vertList.items.len) |e| mesh.vertices[e] = vertList.items[@intCast(e)];
-        for (0..texList.items.len) |e| mesh.texcoords[e] = texList.items[@intCast(e)];
+        for (0..texList.items.len) |e| texCoords[e] = texList.items[@intCast(e)];
 
-        try model.UploadMesh(&mesh, false);
+        var i: usize = 0;
+        var vi: usize = 0;
+        var vt: usize = 0;
+
+        while (vertList.items.len > i) {
+            vertlistcap[vi] = @as(u8, texCoords[vi]);
+            vertlistcap[vi] <<= 8;
+
+            vertlistcap[vi] += @as(u6, @intFromFloat(vertList.items[i] + 0.5));
+            vertlistcap[vi] <<= 6;
+            vertlistcap[vi] += @as(u6, @intFromFloat(vertList.items[i + 1] + 0.5));
+            vertlistcap[vi] <<= 6;
+            vertlistcap[vi] += @as(u6, @intFromFloat(vertList.items[i + 2] + 0.5));
+            //            print(" {} {} {} \n",.{@as(u6, @intFromFloat(vertList.items[i] + 0.5)),@as(u6, @intFromFloat(vertList.items[i + 2] + 0.5)), @as(u6, @intFromFloat(vertList.items[i + 1] + 0.5))});
+            //
+            //            print("{d:8} \n",.{(vertlistcap[i] >> 12) & 0x3F});
+            //            print("{d:8} \n",.{(vertlistcap[i] >> 6) & 0x3F});
+            //            print("{d:8} \n",.{(vertlistcap[i] >> 0) & 0x3F});
+            vt += 2;
+            vi += 1;
+            i += 3;
+        }
+
+        try model.UploadMesh(&mesh, vertlistcap.ptr);
 
         self.Model = ray.LoadModelFromMesh(mesh);
 
@@ -141,10 +167,10 @@ pub var map = std.AutoHashMap(u96, Chunk).init(util.allocator);
 
 pub fn draw() void {
     var mapIter = map.iterator();
-    for (0..5) |x|{
-        for (0..5) |y|{
-            for (0..5) |z|{
-                var pos = util.toVec3(.{x, y, z});
+    for (0..5) |x| {
+        for (0..5) |y| {
+            for (0..5) |z| {
+                var pos = util.toVec3(.{ x, y, z });
                 pos = ray.Vector3Scale(pos, chunkSize);
                 pos = ray.Vector3AddValue(pos, (chunkSize / 2));
                 pos = ray.Vector3AddValue(pos, -0.5);
@@ -171,13 +197,13 @@ pub fn update() void {
     }
 }
 
-fn isTransparent(i: u8) bool{
-    if(i == 0 or i == 2 or i == 6)
+fn isTransparent(i: u8) bool {
+    if (i == 0 or i == 2 or i == 6)
         return true;
     return false;
 }
 
-// x i32 + y i32 + z i32 = u96 for hashing 
+// x i32 + y i32 + z i32 = u96 for hashing
 fn hashingFunc(x: i32, y: i32, z: i32) u96 {
     var result: u96 = @as(u32, @bitCast(x));
     result <<= 32;
@@ -202,7 +228,7 @@ pub fn chunkPosFromHash(key: u96) ray.Vector3 {
 pub fn getBlock(position: anytype) u8 {
     const pos = util.toIntVec3(position);
 
-    const chunk = map.get(hashingFunc(@divFloor(pos.x, chunkSize), @divFloor(pos.y, chunkSize), @divFloor(pos.z, chunkSize)));
+    const chunk = getChunk(toChunkPos(pos));
 
     if (chunk == null) {
         //print("failed to get chunk at x:{} y:{} z:{} \n", .{ @divFloor(x, chunkSize), @divFloor(y, chunkSize), @divFloor(z, chunkSize) });
@@ -212,14 +238,14 @@ pub fn getBlock(position: anytype) u8 {
     return chunk.?.Blocks[@intCast(@mod(pos.x, chunkSize))][@intCast(@mod(pos.y, chunkSize))][@intCast(@mod(pos.z, chunkSize))];
 }
 
-pub fn toChunkPos(position: anytype) ray.Vector3{
+pub fn toChunkPos(position: anytype) ray.Vector3 {
     const pos = util.toIntVec3(position);
-    return util.toVec3(.{@divFloor(pos.x, chunkSize), @divFloor(pos.y, chunkSize), @divFloor(pos.z, chunkSize)});
+    return util.toVec3(.{ @divFloor(pos.x, chunkSize), @divFloor(pos.y, chunkSize), @divFloor(pos.z, chunkSize) });
 }
 
-pub fn toWorldPos(position: anytype) ray.Vector3{
+pub fn toWorldPos(position: anytype) ray.Vector3 {
     const pos = util.toVec3(position);
-    return util.toVec3(.{pos.x * chunkSize, pos.y * chunkSize, pos.z * chunkSize});
+    return util.toVec3(.{ pos.x * chunkSize, pos.y * chunkSize, pos.z * chunkSize });
 }
 
 pub fn getChunk(position: anytype) ?*Chunk {
@@ -229,7 +255,7 @@ pub fn getChunk(position: anytype) ?*Chunk {
 // gen if there is no chunk
 pub fn getChunkOrGen(position: anytype) *Chunk {
     const pos = util.toIntVec3(position);
-    if(map.getPtr(hashingFunc(pos.x, pos.y, pos.z)) == null){
+    if (map.getPtr(hashingFunc(pos.x, pos.y, pos.z)) == null) {
         addChunk(pos);
     }
     return map.getPtr(hashingFunc(pos.x, pos.y, pos.z)).?;
@@ -240,12 +266,12 @@ pub fn setBlock(position: anytype, b: u8) void {
     const chunk = getChunkOrGen(toChunkPos(pos));
 
     // update Chunks around block that is updated
-    if(getBlock(.{pos.x, pos.y + 1, pos.z}) != 0) getChunkOrGen(toChunkPos(.{pos.x, pos.y + 1, pos.z})).*.Dirty = true;
-    if(getBlock(.{pos.x, pos.y - 1, pos.z}) != 0) getChunkOrGen(toChunkPos(.{pos.x, pos.y - 1, pos.z})).*.Dirty = true;
-    if(getBlock(.{pos.x + 1, pos.y, pos.z}) != 0) getChunkOrGen(toChunkPos(.{pos.x + 1, pos.y, pos.z})).*.Dirty = true;
-    if(getBlock(.{pos.x - 1, pos.y, pos.z}) != 0) getChunkOrGen(toChunkPos(.{pos.x - 1, pos.y, pos.z})).*.Dirty = true;
-    if(getBlock(.{pos.x, pos.y, pos.z + 1}) != 0) getChunkOrGen(toChunkPos(.{pos.x, pos.y, pos.z + 1})).*.Dirty = true;
-    if(getBlock(.{pos.x, pos.y, pos.z - 1}) != 0) getChunkOrGen(toChunkPos(.{pos.x, pos.y, pos.z - 1})).*.Dirty = true;
+    if (getBlock(.{ pos.x, pos.y + 1, pos.z }) != 0) getChunkOrGen(toChunkPos(.{ pos.x, pos.y + 1, pos.z })).*.Dirty = true;
+    if (getBlock(.{ pos.x, pos.y - 1, pos.z }) != 0) getChunkOrGen(toChunkPos(.{ pos.x, pos.y - 1, pos.z })).*.Dirty = true;
+    if (getBlock(.{ pos.x + 1, pos.y, pos.z }) != 0) getChunkOrGen(toChunkPos(.{ pos.x + 1, pos.y, pos.z })).*.Dirty = true;
+    if (getBlock(.{ pos.x - 1, pos.y, pos.z }) != 0) getChunkOrGen(toChunkPos(.{ pos.x - 1, pos.y, pos.z })).*.Dirty = true;
+    if (getBlock(.{ pos.x, pos.y, pos.z + 1 }) != 0) getChunkOrGen(toChunkPos(.{ pos.x, pos.y, pos.z + 1 })).*.Dirty = true;
+    if (getBlock(.{ pos.x, pos.y, pos.z - 1 }) != 0) getChunkOrGen(toChunkPos(.{ pos.x, pos.y, pos.z - 1 })).*.Dirty = true;
     //getChunkOrGen(toChunkPos(.{pos.x, pos.y + 1, pos.z})).*.Dirty = if (getBlock(.{pos.x, pos.y + 1, pos.z}) != 0) true else false;
 
     chunk.*.Blocks[@intCast(@mod(pos.x, chunkSize))][@intCast(@mod(pos.y, chunkSize))][@intCast(@mod(pos.z, chunkSize))] = b;

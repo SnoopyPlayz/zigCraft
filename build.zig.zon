@@ -4,8 +4,8 @@
     .dependencies = .{
         .@"raylib-zig" = .{
             //.url = "https://github.com/Not-Nik/raylib-zig/archive/refs/tags/v5.5-dev.zip",
-            .url = "https://github.com/Not-Nik/raylib-zig/archive/refs/heads/devel.zip",
-            .hash = "12206cf18aea41dc1e61b697c36ef627752e84fe9a9362b800240fce7dea3665094d",
+            .url = "https://github.com/SnoopyPlayz/raylib-zig-fork/archive/refs/heads/devel.zip",
+            .hash = "1220730e8b02df0ea2cede1a6a46ad0ec3d11a1a8b7da24434216af73f9463a15501",
         },
         //.tracy = .{
         //    .url = "https://github.com/nektro/zig-tracy/archive/refs/heads/master.zip",

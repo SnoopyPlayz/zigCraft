@@ -60,8 +60,8 @@ pub fn gen(position: anytype) void {
 pub fn init() !void {
     //var list = std.ArrayList(std.Thread).init(util.allocator);
 
-    for(0..5)|i|{
-        for(0..5)|y|{
+    for(0..2)|i|{
+        for(0..2)|y|{
             gen(.{i, 0, y});
             //try list.append(try std.Thread.spawn(.{}, gen, .{@as(ray.Vector3, .{.x = @floatFromInt(i), .y = 0, .z = @floatFromInt(y)})}));
         }

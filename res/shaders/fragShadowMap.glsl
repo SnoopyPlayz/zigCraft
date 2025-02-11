@@ -7,7 +7,7 @@
 in vec3 fragPosition;
 in vec2 fragTexCoord;
 //in vec4 fragColor;
-in vec3 fragNormal;
+//in vec3 fragNormal;
 
 // Input uniform values
 uniform sampler2D texture0;
@@ -32,7 +32,7 @@ void main()
     // Texel color fetching from texture sampler
     vec4 texelColor = texture(texture0, fragTexCoord);
     vec3 lightDot = vec3(0.0);
-    vec3 normal = normalize(fragNormal);
+    vec3 normal = normalize(vec3(1,1,1));
     vec3 viewD = normalize(viewPos - fragPosition);
     vec3 specular = vec3(0.0);
 
