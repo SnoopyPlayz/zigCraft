@@ -108,12 +108,12 @@ fn sendRay() ?ray.Vector3 {
  
         //rayBlockPos = ray.Vector3AddValue(rayBlockPos, 0.5);
 
-        const block = map.getBlock(rayBlockPos);
+        const block = map.getBlock(ray.Vector3AddValue(rayBlockPos, 0.5));
 
         if (block != 0) {
             ray.DrawSphere(rayBlockPos, 0.1,ray.RED);
             //ray.DrawSphere(.{ .x = @round(rayBlockPos.x), .y = @round(rayBlockPos.y), .z = @round(rayBlockPos.z)}, 0.8, ray.GREEN );
-            ray.DrawSphere(util.toVec3(util.toIntVec3(rayBlockPos)), 0.9,ray.BLUE);
+            ray.DrawSphere(util.toVec3(util.toIntVec3(rayBlockPos)), 0.7,ray.BLUE);
             //ray.DrawSphere(rayBlockPos, 0.9,ray.GREEN);
             return rayBlockPos;
         }
