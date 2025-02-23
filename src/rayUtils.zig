@@ -1,0 +1,85 @@
+const std = @import("std");
+const ray = @import("raylib.zig");
+const util = @import("rayUtils.zig");
+const print = std.debug.print;
+
+var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+pub const allocator = gpa.allocator(); // main game allocator
+//pub const allocator = std.heap.c_allocator;
+
+var map = std.StringHashMap(ray.Texture).init(allocator);
+
+pub fn loadTexture(texLoc: []const u8) ray.Texture {
+    // give texture if already loaded
+    if (map.get(texLoc) != null)
+        return map.get(texLoc).?;
+
+    const texture: ray.Texture = ray.LoadTexture(@ptrCast(texLoc));
+
+    //ray.GenTextureMipmaps(@ptrCast(&texture));
+    //ray.SetTextureWrap(texture, ray.TEXTURE_WRAP_REPEAT);
+    ray.SetTextureFilter(texture, ray.TEXTURE_FILTER_POINT);
+
+    map.put(texLoc, texture) catch |err| print("texture hashmap failed: {}", .{err});
+    return texture;
+}
+
+var keys = std.ArrayList(u16).init(util.allocator);
+
+pub fn IsKeyPressed(key: c_int) bool {
+    for (keys.items) |k| {
+        if (k == key)
+            return true;
+    }
+    return false;
+}
+
+pub fn clearKeys() void {
+    keys.clearAndFree();
+}
+
+pub fn updateKeysPressed() void {
+    while (true) {
+        const key = ray.GetKeyPressed();
+        if (key == 0) break;
+        keys.append(@intCast(key)) catch {};
+    }
+
+    for (0..6) |mouseKey| {
+        if (ray.IsMouseButtonPressed(@intCast(mouseKey))) {
+            keys.append(@intCast(mouseKey)) catch {};
+        }
+    }
+}
+
+pub fn toVec3(pos: anytype) ray.Vector3 {
+    if (@TypeOf(pos) == ray.Vector3)
+        return pos;
+
+    if (@TypeOf(pos) == Vector3Int)
+        return ray.Vector3{ .x = @floatFromInt(pos.x), .y = @floatFromInt(pos.y), .z = @floatFromInt(pos.z) };
+
+    if (@typeInfo(@TypeOf(pos[0])) == .Int)
+        return ray.Vector3{ .x = @floatFromInt(pos[0]), .y = @floatFromInt(pos[1]), .z = @floatFromInt(pos[2]) };
+
+    return ray.Vector3{ .x = @floatCast(pos[0]), .y = @floatCast(pos[1]), .z = @floatCast(pos[2]) };
+}
+
+pub const Vector3Int = struct {
+    x: i32,
+    y: i32,
+    z: i32,
+};
+
+pub fn toIntVec3(pos: anytype) Vector3Int {
+    if (@TypeOf(pos) == Vector3Int)
+        return pos;
+
+    if (@TypeOf(pos) == ray.Vector3)
+        return Vector3Int{ .x = @intFromFloat(pos.x), .y = @intFromFloat(pos.y), .z = @intFromFloat(pos.z) };
+
+    if (@typeInfo(@TypeOf(pos[0])) == .Float)
+        return Vector3Int{ .x = @intFromFloat(pos[0]), .y = @intFromFloat(pos[1]), .z = @intFromFloat(pos[2]) };
+
+    return Vector3Int{ .x = @intCast(pos[0]), .y = @intCast(pos[1]), .z = @intCast(pos[2]) };
+}
