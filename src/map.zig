@@ -122,18 +122,7 @@ const Chunk = struct {
             .vertexCount = @intCast(vertList.items.len / 3),
 
             .indices = @ptrCast(try util.allocator.alloc(u16, indsList.items.len)),
-            .vertices = null,
-            .texcoords = null,
-            .texcoords2 = null,
-            .normals = null,
-            .tangents = null,
-            .colors = null,
-            .animVertices = null,
-            .animNormals = null,
-            .boneIds = null,
-            .boneWeights = null,
-            .vaoId = 0,
-            .vboId = null,
+            .vertices = null,.texcoords = null,.texcoords2 = null,.normals = null,.tangents = null,.colors = null,.animVertices = null,.animNormals = null,.boneIds = null,.boneWeights = null,.vaoId = 0,.vboId = null,
         };
         var vertlistcap = try util.allocator.alloc(u32, vertList.items.len);
         var texCoords = try util.allocator.alloc(u8, texList.items.len);
@@ -176,17 +165,17 @@ pub var map = std.AutoHashMap(u96, Chunk).init(util.allocator);
 
 pub fn draw() void {
     var mapIter = map.iterator();
-    for (0..5) |x| {
-        for (0..5) |y| {
-            for (0..5) |z| {
-                var pos = util.toVec3(.{ x, y, z });
-                pos = ray.Vector3Scale(pos, chunkSize);
-                pos = ray.Vector3AddValue(pos, (chunkSize / 2));
-                pos = ray.Vector3AddValue(pos, -0.5);
-                ray.DrawCubeWires(pos, chunkSize, chunkSize, chunkSize, ray.WHITE);
-            }
-        }
-    }
+//    for (0..5) |x| {
+//        for (0..5) |y| {
+//            for (0..5) |z| {
+//                var pos = util.toVec3(.{ x, y, z });
+//                pos = ray.Vector3Scale(pos, chunkSize);
+//                pos = ray.Vector3AddValue(pos, (chunkSize / 2));
+//                pos = ray.Vector3AddValue(pos, -0.5);
+//                ray.DrawCubeWires(pos, chunkSize, chunkSize, chunkSize, ray.WHITE);
+//            }
+//        }
+//    }
 
     while (mapIter.next()) |chunk| {
         if (chunk.value_ptr.Model == null) continue;
