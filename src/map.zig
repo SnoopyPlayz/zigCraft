@@ -7,7 +7,7 @@ const player = @import("player.zig");
 const util = @import("rayUtils.zig");
 const print = std.debug.print;
 
-pub const chunkSize: u8 = 16;
+pub const chunkSize: u8 = 32;
 
 const Chunk = struct {
     Blocks: [chunkSize][chunkSize][chunkSize]u8,
@@ -143,11 +143,6 @@ const Chunk = struct {
             vertlistcap[vi] += @as(u6, @intFromFloat(vertList.items[i + 1] + 0.5));
             vertlistcap[vi] <<= 6;
             vertlistcap[vi] += @as(u6, @intFromFloat(vertList.items[i + 2] + 0.5));
-            //            print(" {} {} {} \n",.{@as(u6, @intFromFloat(vertList.items[i] + 0.5)),@as(u6, @intFromFloat(vertList.items[i + 2] + 0.5)), @as(u6, @intFromFloat(vertList.items[i + 1] + 0.5))});
-            //
-            //            print("{d:8} \n",.{(vertlistcap[i] >> 12) & 0x3F});
-            //            print("{d:8} \n",.{(vertlistcap[i] >> 6) & 0x3F});
-            //            print("{d:8} \n",.{(vertlistcap[i] >> 0) & 0x3F});
             i += 3;
             vi = i / 3;
         }
@@ -165,24 +160,15 @@ pub var map = std.AutoHashMap(u96, Chunk).init(util.allocator);
 
 pub fn draw() void {
     var mapIter = map.iterator();
-//    for (0..5) |x| {
-//        for (0..5) |y| {
-//            for (0..5) |z| {
-//                var pos = util.toVec3(.{ x, y, z });
-//                pos = ray.Vector3Scale(pos, chunkSize);
-//                pos = ray.Vector3AddValue(pos, (chunkSize / 2));
-//                pos = ray.Vector3AddValue(pos, -0.5);
-//                ray.DrawCubeWires(pos, chunkSize, chunkSize, chunkSize, ray.WHITE);
-//            }
-//        }
-//    }
 
     while (mapIter.next()) |chunk| {
         if (chunk.value_ptr.Model == null) continue;
-        if (!cull.isChunkVisible(toWorldPos(chunkPosFromHash(chunk.key_ptr.*)))) continue;
-        ray.DrawModel(chunk.value_ptr.Model.?, toWorldPos(chunkPosFromHash(chunk.key_ptr.*)), 1, ray.WHITE);
+
+        const pos = toWorldPos(chunkPosFromHash(chunk.key_ptr.*));
+        if (!cull.isChunkVisible(pos)) continue;
+        ray.DrawModel(chunk.value_ptr.Model.?, pos, 1, ray.WHITE);
+        ray.DrawCubeWires(ray.Vector3AddValue(pos, -0.5 + @as(f32, @floatFromInt(chunkSize)) / 2.0), chunkSize, chunkSize, chunkSize, ray.WHITE);
     }
-    //print(" {} \n", .{i});
 }
 
 pub fn update() void {
