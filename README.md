@@ -14,7 +14,7 @@ zig build run -Doptimize=ReleaseFast --release=fast
 ```
 
 ## controls
-0 - 9 - select block
-right click - place block
-left clock - remove block
-wasd - move
+0 - 9 - select block <br>
+right click - place block<br>
+left clock - remove block<br>
+wasd - move<br>
