@@ -12,3 +12,9 @@ git clone https://github.com/SnoopyPlayz/zigCraft.git
 cd zigCraft
 zig build run -Doptimize=ReleaseFast --release=fast
 ```
+
+## controls
+0 - 9 - select block
+right click - place block
+left clock - remove block
+wasd - move
