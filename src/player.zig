@@ -30,15 +30,9 @@ pub fn update() void {
     //
     //print("{} \n",.{map.toChunkPos(.{camera.position.x, 0, camera.position.z})});
 
-    if (map.getChunk(map.toChunkPos(.{ camera.position.x, 0, camera.position.z })) == null) {
-        mapGen.gen(map.toChunkPos(.{ camera.position.x, 0, camera.position.z }));
-    } else if (map.getChunk(map.toChunkPos(.{ camera.position.x, 0, camera.position.z })).?.Generated == false) {
-        mapGen.gen(map.toChunkPos(.{ camera.position.x, 0, camera.position.z }));
-    }
-
     const posChunkPos = util.toIntVec3(map.toChunkPos(.{ camera.position.x, 0, camera.position.z }));
 
-    const rednderDistance = 5;
+    const rednderDistance = 3; // odd number here
     for (0..@intCast(posChunkPos.x - posChunkPos.x + rednderDistance)) |i| {
         for (0..@intCast(posChunkPos.z - posChunkPos.z + rednderDistance)) |y| {
             mapGen.gen(.{ posChunkPos.x + @as(i32, @intCast(i)) - rednderDistance / 2, 0, posChunkPos.z + @as(i32, @intCast(y)) - rednderDistance / 2 });

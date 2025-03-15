@@ -122,7 +122,18 @@ const Chunk = struct {
             .vertexCount = @intCast(vertList.items.len / 3),
 
             .indices = @ptrCast(try util.allocator.alloc(u16, indsList.items.len)),
-            .vertices = null,.texcoords = null,.texcoords2 = null,.normals = null,.tangents = null,.colors = null,.animVertices = null,.animNormals = null,.boneIds = null,.boneWeights = null,.vaoId = 0,.vboId = null,
+            .vertices = null,
+            .texcoords = null,
+            .texcoords2 = null,
+            .normals = null,
+            .tangents = null,
+            .colors = null,
+            .animVertices = null,
+            .animNormals = null,
+            .boneIds = null,
+            .boneWeights = null,
+            .vaoId = 0,
+            .vboId = null,
         };
         var vertlistcap = try util.allocator.alloc(u32, vertList.items.len);
         var texCoords = try util.allocator.alloc(u8, texList.items.len);
@@ -250,9 +261,9 @@ pub fn setBlock(position: anytype, b: u8) void {
     const chunk = getChunkOrGen(toChunkPos(pos));
 
     // update Chunks around block that is updated
-    const sides = [_] util.Vector3Int {.{.x = 0, .y = 1, .z = 0},.{.x = 0, .y = -1, .z = 0},.{.x = 1, .y = 0, .z = 0},.{.x = -1, .y = 0, .z = 0}, .{.x = 0,.y = 0, .z = 1}, .{.x = 0, .y = 0, .z = -1}};
-    for(sides) |s| {
-        if (getBlock(.{ pos.x + s.x, pos.y + s.y, pos.z + s.z }) != 0){
+    const sides = [_]util.Vector3Int{ .{ .x = 0, .y = 1, .z = 0 }, .{ .x = 0, .y = -1, .z = 0 }, .{ .x = 1, .y = 0, .z = 0 }, .{ .x = -1, .y = 0, .z = 0 }, .{ .x = 0, .y = 0, .z = 1 }, .{ .x = 0, .y = 0, .z = -1 } };
+    for (sides) |s| {
+        if (getBlock(.{ pos.x + s.x, pos.y + s.y, pos.z + s.z }) != 0) {
             getChunkOrGen(toChunkPos(.{ pos.x + s.x, pos.y + s.y, pos.z + s.z })).*.Dirty = true;
         }
     }
