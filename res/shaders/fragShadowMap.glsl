@@ -32,7 +32,7 @@ void main()
     // Texel color fetching from texture sampler
     vec4 texelColor = texture(texture0, fragTexCoord);
 
-    if(texelColor.a < 0.1)
+    if(texelColor.a < 0.1) // transparency fix
 	discard;
 
     vec3 lightDot = vec3(0.0);
