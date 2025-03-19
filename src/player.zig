@@ -15,7 +15,64 @@ pub var camera = ray.Camera3D{
 };
 
 var selectedBlock: u8 = 1;
+var pos: ray.Vector3 = .{ .x = 1, .y = 40, .z = 1 };
+
+fn movementUpdate() void {
+    const speed: f32 = 0.1;
+
+    const target: ray.Vector2 = .{ .x = camera.target.x, .y = camera.target.z };
+    const camPos: ray.Vector2 = .{ .x = camera.position.x, .y = camera.position.z };
+
+    var movement: ray.Vector3 = ray.Vector3Zero();
+
+    if (ray.IsKeyDown(ray.KEY_W)) {
+        const sub = ray.Vector2Scale(ray.Vector2Normalize(ray.Vector2Subtract(target, camPos)), speed);
+        movement = ray.Vector3Add(movement, util.toVec3(.{ sub.x, 0, sub.y }));
+    }
+
+    if (ray.IsKeyDown(ray.KEY_S)) {
+        const sub = ray.Vector2Scale(ray.Vector2Normalize(ray.Vector2Subtract(target, camPos)), speed);
+        movement = ray.Vector3Subtract(movement, util.toVec3(.{ sub.x, 0, sub.y }));
+    }
+
+    if (ray.IsKeyDown(ray.KEY_A)) {
+        const forward = ray.Vector3Normalize(ray.Vector3Subtract(camera.target, camera.position));
+        const right = ray.Vector3Normalize(ray.Vector3CrossProduct(util.toVec3(.{ 0, 1, 0 }), forward));
+        movement = ray.Vector3Add(movement, ray.Vector3Scale(right, 0.1));
+    }
+
+    if (ray.IsKeyDown(ray.KEY_D)) {
+        const forward = ray.Vector3Normalize(ray.Vector3Subtract(camera.target, camera.position));
+        const right = ray.Vector3Normalize(ray.Vector3CrossProduct(util.toVec3(.{ 0, 1, 0 }), forward));
+        movement = ray.Vector3Subtract(movement, ray.Vector3Scale(right, 0.1));
+    }
+
+    if (ray.IsKeyDown(ray.KEY_W) or ray.IsKeyDown(ray.KEY_S)) {
+        if (ray.IsKeyDown(ray.KEY_A) or ray.IsKeyDown(ray.KEY_D)) {
+            movement = ray.Vector3Scale(movement, 0.75);
+        }
+    }
+
+    pos.x += movement.x;
+    pos.z += movement.z;
+}
+
 pub fn update() void {
+    const t = ray.Vector3Subtract(camera.target, camera.position);
+    camera.position = pos;
+    camera.target = pos;
+    camera.target = ray.Vector3Add(camera.target, t);
+
+    if (ray.IsKeyDown(ray.KEY_SPACE)) {
+        pos.y += 0.1;
+    }
+
+    if (ray.IsKeyDown(ray.KEY_LEFT_CONTROL)) {
+        pos.y -= 0.1;
+    }
+
+    movementUpdate();
+
     // Shadow follow player
     if (@abs((shader.lightCam.position.x + shader.lightCam.position.z) - (camera.position.x + camera.position.z)) > 50) {
         shader.lightCam.position.x = camera.position.x;
@@ -32,7 +89,7 @@ pub fn update() void {
 
     const posChunkPos = util.toIntVec3(map.toChunkPos(.{ camera.position.x, 0, camera.position.z }));
 
-    const rednderDistance = 3; // odd number here
+    const rednderDistance = 1; // odd number here
     for (0..@intCast(posChunkPos.x - posChunkPos.x + rednderDistance)) |i| {
         for (0..@intCast(posChunkPos.z - posChunkPos.z + rednderDistance)) |y| {
             mapGen.gen(.{ posChunkPos.x + @as(i32, @intCast(i)) - rednderDistance / 2, 0, posChunkPos.z + @as(i32, @intCast(y)) - rednderDistance / 2 });

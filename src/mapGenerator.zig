@@ -5,14 +5,14 @@ const util = @import("rayUtils.zig");
 const print = std.debug.print;
 
 pub fn gen(position: anytype) void {
-    if (map.getChunk(position) != null) {
-        if (map.getChunk(position).?.Generated == true) {
-            //print("already Generated {} \n", .{position});
-            return;
-        } else {
-            map.getChunk(position).?.Generated = true;
-        }
+    if (map.getChunk(position) == null) {
+        map.addChunk(position);
     }
+    if (map.getChunk(position).?.Generated == true) {
+        return;
+    }
+
+    map.getChunk(position).?.Generated = true;
 
     const pos = util.toIntVec3(map.toWorldPos(util.toVec3(position)));
 
@@ -53,8 +53,6 @@ pub fn gen(position: anytype) void {
             }
         }
     }
-
-    map.getChunk(position).?.Generated = true;
 }
 
 pub fn init() !void {

@@ -3,7 +3,7 @@ const ray = @import("raylib.zig");
 const util = @import("rayUtils.zig");
 const print = std.debug.print;
 
-var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+var gpa = std.heap.DebugAllocator(.{}){};
 pub const allocator = gpa.allocator(); // main game allocator
 //pub const allocator = std.heap.c_allocator;
 

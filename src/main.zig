@@ -46,11 +46,8 @@ pub fn main() !void {
 
         util.updateKeysPressed();
 
-        ray.UpdateCamera(&p.camera, ray.CAMERA_FREE);
-        if (ray.IsKeyDown(ray.KEY_LEFT_SHIFT)) {
-            ray.UpdateCamera(&p.camera, ray.CAMERA_FREE);
-        }
-        //ray.UpdateCameraPro(&camera, .{ .x = 0.0, .y = 0.0, .z = 0.0 }, .{ .x = @floatCast(ray.GetMouseDelta().x * 0.05), .y = @floatCast(ray.GetMouseDelta().y * 0.05), .z = 0.0 }, // rotation 0.0); // zoom
+        //ray.UpdateCamera(&p.camera, ray.CAMERA_FREE);
+        ray.UpdateCameraPro(&p.camera, .{ .x = 0.0, .y = 0.0, .z = 0.0 }, .{ .x = @floatCast(ray.GetMouseDelta().x * 0.05), .y = @floatCast(ray.GetMouseDelta().y * 0.05), .z = 0.0 }, 0.0); // zoom
         shader.drawShadow();
         ray.ClearBackground(ray.GRAY);
 
