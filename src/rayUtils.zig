@@ -78,7 +78,7 @@ pub fn toIntVec3(pos: anytype) Vector3Int {
     if (@TypeOf(pos) == ray.Vector3)
         return Vector3Int{ .x = @intFromFloat(pos.x), .y = @intFromFloat(pos.y), .z = @intFromFloat(pos.z) };
 
-    if (@typeInfo(@TypeOf(pos[0])) == .float)
+    if (@typeInfo(@TypeOf(pos[0])) == .float or @TypeOf(pos[0]) == comptime_float)
         return Vector3Int{ .x = @intFromFloat(pos[0]), .y = @intFromFloat(pos[1]), .z = @intFromFloat(pos[2]) };
 
     return Vector3Int{ .x = @intCast(pos[0]), .y = @intCast(pos[1]), .z = @intCast(pos[2]) };

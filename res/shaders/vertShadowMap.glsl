@@ -23,7 +23,8 @@ vec3 UnpackInt(uint pos) {
 	uint y = (pos >> 6) & uint(0x3F);
 	uint z = pos & uint(0x3F);
 
-	return vec3(float(x) - 0.5,float(y) - 0.5,float(z) - 0.5);
+	//return vec3(float(x) - 0.5,float(y) - 0.5,float(z) - 0.5);
+	return vec3(float(x),float(y),float(z));
 }
 
 void main(){

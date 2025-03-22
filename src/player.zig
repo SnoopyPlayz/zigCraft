@@ -7,15 +7,32 @@ const std = @import("std");
 const print = std.debug.print;
 
 pub var camera = ray.Camera3D{
-    .position = .{ .x = 1.0, .y = 40.0, .z = 1.0 },
+    .position = .{ .x = 0.1, .y = 40.0, .z = 0.1 },
     .target = .{ .x = 0.0, .y = 0.0, .z = 0.0 },
     .up = .{ .x = 0.0, .y = 1.0, .z = 0.0 },
     .fovy = 90.0,
     .projection = ray.CAMERA_PERSPECTIVE,
 };
 
+fn AABBintersect(firstPos: anytype, firstSize: anytype, secondPos: anytype, secondSize: anytype) bool {
+    const a = util.toVec3(firstPos);
+    const asize = ray.Vector3Add(util.toVec3(firstSize), a);
+    const b = util.toVec3(secondPos);
+    const bsize = ray.Vector3Add(util.toVec3(secondSize), b);
+
+    return (a.x <= bsize.x and
+        asize.x >= b.x and
+        a.y <= bsize.y and
+        asize.y >= b.y and
+        a.z <= bsize.z and
+        asize.z >= b.z);
+}
+
 var selectedBlock: u8 = 1;
-var pos: ray.Vector3 = .{ .x = 1, .y = 40, .z = 1 };
+var pos: ray.Vector3 = .{ .x = 0, .y = 40, .z = 0 };
+var vel: ray.Vector3 = .{ .x = 0, .y = 0, .z = 0 };
+const playerHeight: f32 = 1.83;
+const playerLength = 0.25;
 
 fn movementUpdate() void {
     const speed: f32 = 0.1;
@@ -57,19 +74,46 @@ fn movementUpdate() void {
     pos.z += movement.z;
 }
 
+fn groundCheck() bool {
+    var playerCorner = pos;
+    playerCorner.x -= playerLength * 0.5;
+    playerCorner.z -= playerLength * 0.5;
+
+    if (map.getBlock(.{ pos.x + playerLength * 0.5, pos.y - playerHeight, pos.z + playerLength * 0.5 }) != 0 or
+        map.getBlock(.{ playerCorner.x, pos.y - playerHeight, pos.z + playerLength * 0.5 }) != 0 or
+        map.getBlock(.{ pos.x + playerLength * 0.5, pos.y - playerHeight, playerCorner.z }) != 0 or
+        map.getBlock(.{ playerCorner.x, pos.y - playerHeight, playerCorner.z }) != 0)
+    {
+        return true;
+    }
+
+    return false;
+}
+
 pub fn update() void {
     const t = ray.Vector3Subtract(camera.target, camera.position);
-    camera.position = pos;
     camera.target = pos;
     camera.target = ray.Vector3Add(camera.target, t);
+    camera.position = pos;
 
-    if (ray.IsKeyDown(ray.KEY_SPACE)) {
-        pos.y += 0.1;
+    if (groundCheck() and util.IsKeyPressed(ray.KEY_SPACE)) {
+        //print("g {} \n", .{ray.GetRandomValue(0, 1243)});
+        vel.y += 0.2;
     }
 
-    if (ray.IsKeyDown(ray.KEY_LEFT_CONTROL)) {
-        pos.y -= 0.1;
+    if (!groundCheck()) {
+        vel.y -= 0.01;
     }
+
+    if (groundCheck()) {
+        if (vel.y < 0) {
+            vel.y = 0;
+        }
+    }
+
+    pos.y += vel.y;
+
+    //print("{d:12} z: {d:12} \n", .{ pos.x, pos.z });
 
     movementUpdate();
 
@@ -119,8 +163,13 @@ pub fn update() void {
         return;
     }
 
+    const rayCastP = sendRayBeforeHit();
+    if (rayCastP == null) {
+        return;
+    }
+
     if (util.IsKeyPressed(ray.MOUSE_BUTTON_RIGHT))
-        map.setBlock(rayCast.?, selectedBlock);
+        map.setBlock(rayCastP.?, selectedBlock);
 
     if (util.IsKeyPressed(ray.MOUSE_BUTTON_LEFT))
         map.setBlock(rayCast.?, 0);
@@ -138,7 +187,7 @@ fn sendRay() ?ray.Vector3 {
         const distance = @as(f32, @floatFromInt(i)) * stepAmount;
 
         var rayBlockPos = ray.Vector3MoveTowards(camera.position, camera.target, distance);
-        rayBlockPos = .{ .x = @round(rayBlockPos.x), .y = @round(rayBlockPos.y), .z = @round(rayBlockPos.z) };
+        rayBlockPos = .{ .x = @floor(rayBlockPos.x), .y = @floor(rayBlockPos.y), .z = @floor(rayBlockPos.z) };
 
         const block = map.getBlock(rayBlockPos);
 
@@ -152,8 +201,56 @@ fn sendRay() ?ray.Vector3 {
     return null;
 }
 
+fn sendRayBeforeHit() ?ray.Vector3 {
+    const amount = 50;
+    const stepAmount = 0.1;
+
+    for (0..amount) |i| {
+        const distance = @as(f32, @floatFromInt(i)) * stepAmount;
+
+        var rayBlockPos = ray.Vector3MoveTowards(camera.position, camera.target, distance);
+        rayBlockPos = .{ .x = @floor(rayBlockPos.x), .y = @floor(rayBlockPos.y), .z = @floor(rayBlockPos.z) };
+
+        const block = map.getBlock(rayBlockPos);
+
+        if (block != 0) {
+            var blockPosBeforeHit = ray.Vector3MoveTowards(camera.position, camera.target, distance - stepAmount);
+            blockPosBeforeHit = .{ .x = @floor(blockPosBeforeHit.x), .y = @floor(blockPosBeforeHit.y), .z = @floor(blockPosBeforeHit.z) };
+            //ray.DrawSphere(blockPosBeforeHit, 0.1, ray.RED);
+            //ray.DrawSphere(blockPosBeforeHit, 0.7, ray.GREEN);
+
+            return blockPosBeforeHit;
+        }
+    }
+
+    return null;
+}
+
+fn drawRectangle(position: anytype, size: anytype, color: ray.Color) void {
+    const c1 = util.toVec3(position);
+    const c2 = ray.Vector3Add(util.toVec3(size), c1);
+
+    const posVec = ray.Vector3Scale(ray.Vector3Add(c1, c2), 0.5);
+    const sizeVec = ray.Vector3Subtract(c1, c2);
+
+    ray.DrawCube(posVec, sizeVec.x, sizeVec.y, sizeVec.z, color);
+}
+
 pub fn render() void {
+    var playerCorner = pos;
+    playerCorner.y -= playerHeight;
+    playerCorner.x -= playerLength * 0.5;
+    playerCorner.z -= playerLength * 0.5;
+
+    if (AABBintersect(playerCorner, .{ playerLength, playerLength, playerLength }, .{ 0, 40, 0 }, .{ 1, 1, 1 })) {
+        print("green \n", .{});
+        drawRectangle(.{ 0, 40, 0 }, .{ 1, 1, 1 }, ray.GREEN);
+    } else {
+        drawRectangle(.{ 0, 40, 0 }, .{ 1, 1, 1 }, ray.RED);
+    }
+    drawRectangle(playerCorner, .{ playerLength, playerLength, playerLength }, ray.GREEN);
+
     if (sendRay() != null) {
-        ray.DrawCube(sendRay().?, 1.01, 1.01, 1.01, ray.ColorAlpha(ray.BLACK, 0.5));
+        ray.DrawCube(ray.Vector3AddValue(sendRay().?, 0.5), 1.01, 1.01, 1.01, ray.ColorAlpha(ray.BLACK, 0.5));
     }
 }
