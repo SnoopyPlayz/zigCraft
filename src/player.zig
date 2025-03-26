@@ -33,6 +33,8 @@ var pos: ray.Vector3 = .{ .x = 0, .y = 40, .z = 0 };
 var vel: ray.Vector3 = .{ .x = 0, .y = 0, .z = 0 };
 const playerHeight: f32 = 1.83;
 const playerLength = 0.25;
+var playerCorner: ray.Vector3 = undefined;
+var playerCornes: [4]ray.Vector3 = undefined;
 
 fn movementUpdate() void {
     const speed: f32 = 0.1;
@@ -75,16 +77,9 @@ fn movementUpdate() void {
 }
 
 fn groundCheck() bool {
-    var playerCorner = pos;
-    playerCorner.x -= playerLength * 0.5;
-    playerCorner.z -= playerLength * 0.5;
-
-    if (map.getBlock(.{ pos.x + playerLength * 0.5, pos.y - playerHeight, pos.z + playerLength * 0.5 }) != 0 or
-        map.getBlock(.{ playerCorner.x, pos.y - playerHeight, pos.z + playerLength * 0.5 }) != 0 or
-        map.getBlock(.{ pos.x + playerLength * 0.5, pos.y - playerHeight, playerCorner.z }) != 0 or
-        map.getBlock(.{ playerCorner.x, pos.y - playerHeight, playerCorner.z }) != 0)
-    {
-        return true;
+    for (playerCornes) |c| {
+        if (map.getBlock(c) != 0)
+            return true;
     }
 
     return false;
@@ -95,6 +90,16 @@ pub fn update() void {
     camera.target = pos;
     camera.target = ray.Vector3Add(camera.target, t);
     camera.position = pos;
+
+    playerCorner = pos;
+    playerCorner.y -= playerHeight;
+    playerCorner.x -= playerLength * 0.5;
+    playerCorner.z -= playerLength * 0.5;
+
+    playerCornes[0] = util.toVec3(.{ pos.x - playerLength * 0.5, pos.y - playerHeight, pos.z - playerLength * 0.5 });
+    playerCornes[1] = util.toVec3(.{ pos.x + playerLength * 0.5, pos.y - playerHeight, pos.z + playerLength * 0.5 });
+    playerCornes[2] = util.toVec3(.{ pos.x - playerLength * 0.5, pos.y - playerHeight, pos.z + playerLength * 0.5 });
+    playerCornes[3] = util.toVec3(.{ pos.x + playerLength * 0.5, pos.y - playerHeight, pos.z - playerLength * 0.5 });
 
     if (groundCheck() and util.IsKeyPressed(ray.KEY_SPACE)) {
         //print("g {} \n", .{ray.GetRandomValue(0, 1243)});
@@ -159,20 +164,14 @@ pub fn update() void {
     }
 
     const rayCast = sendRay();
-    if (rayCast == null) {
-        return;
+    if (rayCast != null and util.IsKeyPressed(ray.MOUSE_BUTTON_LEFT)) {
+        map.setBlock(rayCast.?, 0);
     }
 
     const rayCastP = sendRayBeforeHit();
-    if (rayCastP == null) {
-        return;
-    }
-
-    if (util.IsKeyPressed(ray.MOUSE_BUTTON_RIGHT))
+    if (rayCastP != null and util.IsKeyPressed(ray.MOUSE_BUTTON_RIGHT)) {
         map.setBlock(rayCastP.?, selectedBlock);
-
-    if (util.IsKeyPressed(ray.MOUSE_BUTTON_LEFT))
-        map.setBlock(rayCast.?, 0);
+    }
 
     //print("camera target: {} \n",.{ray.Vector3Subtract(camera.target,camera.position)});
     //const t = ray.Vector3Subtract(camera.position, camera.target);
@@ -237,11 +236,6 @@ fn drawRectangle(position: anytype, size: anytype, color: ray.Color) void {
 }
 
 pub fn render() void {
-    var playerCorner = pos;
-    playerCorner.y -= playerHeight;
-    playerCorner.x -= playerLength * 0.5;
-    playerCorner.z -= playerLength * 0.5;
-
     if (AABBintersect(playerCorner, .{ playerLength, playerLength, playerLength }, .{ 0, 40, 0 }, .{ 1, 1, 1 })) {
         print("green \n", .{});
         drawRectangle(.{ 0, 40, 0 }, .{ 1, 1, 1 }, ray.GREEN);
